@@ -1,0 +1,1 @@
+".button-facebook": { width: Alloy.CFG.size_270, height: Alloy.CFG.size_45, top: Alloy.CFG.size_100, backgroundImage: '/images/analyzing/btn-facebook.png' }

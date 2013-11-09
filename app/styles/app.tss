@@ -1,0 +1,16 @@
+".win": { top: Alloy.CFG.pageTop, backgroundColor: '#000', navBarHidden: true, orientationModes: [ Ti.UI.PORTRAIT ] }
+".win[platform=android]": { windowSoftInputMode: Ti.UI.Android.SOFT_INPUT_ADJUST_RESIZE }
+	".page": { backgroundColor: '#000' }
+		".body": { top: Alloy.CFG.size_44 }
+	
+			".textfield-wrapper": { height: Alloy.CFG.size_32, width: Alloy.CFG.size_266, borderColor: '#bababa', borderWidth: Alloy.CFG.size_2, backgroundColor: '#fff' }	
+				".textfield": { font: { fontSize: Alloy.CFG.size_14 }, color: '#212121', height: '110%', width: '100%', backgroundColor: 'transparent', paddingLeft: 10, clearButtonMode: Ti.UI.INPUT_BUTTONMODE_ONFOCUS }	
+				
+			".textarea": { width: Alloy.CFG.size_266, borderColor: '#bababa', borderWidth: Alloy.CFG.size_2, backgroundColor: '#fff', font: { fontSize: Alloy.CFG.size_12 }, color: '#212121' }
+			
+			".ai": { font: { fontSize: Alloy.CFG.size_16 }, color: '#212121', message: 'Loading...' }
+			".ai[platform=ios]": { style: Ti.UI.iPhone.ActivityIndicatorStyle.DARK }
+			".ai[platform=android]": { style: Ti.UI.ActivityIndicatorStyle.DARK }	
+			
+			".scroll-v": { contentHeight: 'auto', scrollType: 'vertical' }
+			".scroll-h": { contentWidth: 'auto', scrollType: 'horizontal' }

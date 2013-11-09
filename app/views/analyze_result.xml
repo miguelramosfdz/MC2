@@ -1,0 +1,77 @@
+<Alloy>
+	<Window class="win">
+		<ScrollableView class="page">
+			<!-- view 1 -->
+			<View>
+				<View class="wrapper">
+					<Label id="lbName" class="title">Amelia</Label>
+					<View class="row margin">
+						<Label class="label">Age:</Label>
+						<Label id="lbAge" class="value">24</Label>
+					</View>
+					<View class="row">
+						<Label class="label">Sex:</Label>
+						<Label id="lbGender" class="value">Female</Label>
+					</View>
+					<Label class="label margin">Current City:</Label>
+					<Label id="lblCity" class="value value-city">San Francisco</Label>
+				</View>
+			</View>
+			
+			<!-- view 2 -->
+			<View>
+				<View class="wrapper">
+					<Label class="title">When are you typically busy?</Label>
+					
+					<Label class="label margin">Weekdays</Label>
+					<View class="row">
+						<Label id='lbBusyText' class="value time-prefix" onClick="togglePrefix">Before:</Label>
+						<Label id='lbBusyValue' class="value" onClick="showTimePicker">6:59AM</Label>
+					</View>
+					
+					<Label class="label margin">Weekends</Label>
+					<View class="row">
+						<Label id='lbWeekendsText' class="value time-prefix" onClick="togglePrefix">After:</Label>
+						<Label id='lbWeekendsValue' class="value" onClick="showTimePicker">10:59PM</Label>
+					</View>
+				</View>
+				
+				<Label class="intro">*MeetCute will not send notifications when you are typically busy, nor any later than 10:59PM and no earlier than 6:59AM local time.</Label>
+			</View>
+			
+			<!-- view 3 -->
+			<View>
+				<View class="wrapper">
+					<Label class="title">Who would you like to \ncross paths with?</Label>
+					<View class="row margin">
+						<Label class="label">Sex:</Label>
+						<Label id="lbTargetGender" class="value" onClick="toggleSex">Anyone</Label>
+					</View>
+					<View class="row">
+						<Label class="label">Age range:</Label>
+						<Label class="value" onClick="showAgePicker" id="ageFrom">20</Label>
+						<Label class="value">-</Label>
+						<Label class="value" onClick="showAgePicker" id="ageTo">25</Label>
+					</View>
+					
+					<!--
+					http://developer.appcelerator.com/question/154984/range-seekbar
+					https://github.com/Larpon/RangeSeekBar
+					https://code.google.com/p/range-seek-bar/	
+					-->
+					<Slider id="ageSlider" class="slider" onChange="setAge"/>
+					
+				</View>
+				
+				<Label class="intro final-intro" onClick="updateAccount">To Be Continued...</Label>
+			</View>
+		</ScrollableView>
+		
+		<!-- time picker -->
+		<Require id="timePicker" src="elements/time_picker"/>
+		
+		<!-- value picker -->
+		<Require id="valuePicker" src="elements/value_picker"/>
+		
+	</Window>	
+</Alloy>

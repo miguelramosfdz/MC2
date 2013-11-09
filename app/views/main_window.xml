@@ -1,0 +1,9 @@
+<Alloy>
+	<Window id="mainWindow" class="win">
+		
+	    <Require type="widget" src="com.madrocket.ti.slidemenu" id="menu" />
+	    
+	    <View id="slideMenuCover" onClick="hideSlideMenu"/>
+	    
+	</Window>
+</Alloy>

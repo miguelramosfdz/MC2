@@ -1,0 +1,7 @@
+<Alloy>
+	<Window id="win" class="win">
+		<View class="page">
+			<Button class="button-facebook" onClick="analyze"/>
+		</View>
+	</Window>
+</Alloy>

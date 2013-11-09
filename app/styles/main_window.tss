@@ -1,0 +1,1 @@
+"#slideMenuCover": { zIndex: 3, width: Alloy.CFG.size_45, top: 0, visible: false }

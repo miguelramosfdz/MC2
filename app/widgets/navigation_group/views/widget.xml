@@ -1,0 +1,9 @@
+<Alloy>
+	<View id="container">
+	    <View id="left" class="button-container"/>
+	    
+	    <View id="center"/>
+	    
+	    <View id="right" class="button-container"/>
+	</View>
+</Alloy>

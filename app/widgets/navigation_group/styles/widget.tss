@@ -1,0 +1,6 @@
+"#container": { height: Alloy.CFG.size_44, top: 0, backgroundImage: '/images/nav/bg.png', zIndex: 1 }
+	".button-container": { width: Alloy.CFG.size_80, height: Alloy.CFG.size_44, top: 0, zIndex: 1 }	
+	"#left": { left: Alloy.CFG.size_5 }
+	"#right": { right: Alloy.CFG.size_5 }
+	
+	"#center": { height: Alloy.CFG.size_44, top: 0 }

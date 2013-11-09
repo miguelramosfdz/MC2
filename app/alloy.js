@@ -9,3 +9,38 @@
 // object. For example:
 //
 // Alloy.Globals.someGlobalFunction = function(){};
+
+/*
+ SIZES CALCULATION
+ * */
+
+var sizeManager = require('size_manager');
+sizeManager.init([
+	5, 7, 9,
+	10, 12, 13, 16, 18,
+	20, 25, 28,
+	30, 31, 32,
+	40, 42, 44, 45,
+	50, 51,
+	60, 63,
+	70,
+	80,
+	100,
+	200,
+	270, 275,
+	300,
+	320
+]);
+Alloy.Globals.SizeManager = sizeManager;
+
+Alloy.Globals.Common = require('common');
+
+// support iOS 7
+
+var pageTop = 0;
+if (OS_IOS) {
+	var version = Ti.Platform.version.split("."),
+		major = parseInt(version[0],10);
+	(major >= 7) && (pageTop = 20);
+}
+Alloy.CFG.pageTop = pageTop;

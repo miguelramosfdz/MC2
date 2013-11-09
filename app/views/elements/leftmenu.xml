@@ -1,0 +1,52 @@
+<Alloy>
+	<ScrollView class="container scroll-v" onClick="menuClicked">
+		<View class="item">
+			<ImageView class="icon" image="/images/menu/cross_paths.png"/>
+			<Label class="title">Cross paths</Label>
+		</View>
+		
+		<View class="border"/>
+		
+		<View class="item" url="someone_like">
+			<ImageView class="icon" image="/images/menu/someone_like.png"/>
+			<Label class="title">Someone like</Label>
+		</View>
+		
+		<View class="border"/>
+		
+		<View class="item">
+			<ImageView class="icon" image="/images/menu/match_preference.png"/>
+			<Label class="title">Match preference</Label>
+		</View>
+		
+		<View class="border"/>
+		
+		<View class="item">
+			<ImageView class="icon" image="/images/menu/more_about_you.png"/>
+			<Label class="title">More about you</Label>
+		</View>
+		
+		<View class="border"/>
+		
+		<View class="item">
+			<ImageView class="icon" image="/images/menu/love.png"/>
+			<Label class="title">Characters</Label>
+		</View>
+		
+		<View class="border"/>
+		
+		<View class="item">
+			<ImageView class="icon" image="/images/menu/matchmaker.png"/>
+			<Label class="title">Matchmaker</Label>
+		</View>
+		
+		<View class="border"/>
+		
+		<View class="item">
+			<ImageView class="icon" image="/images/menu/app_settings.png"/>
+			<Label class="title">App settings</Label>
+		</View>
+		
+		<View class="border"/>
+	</ScrollView>
+</Alloy>
