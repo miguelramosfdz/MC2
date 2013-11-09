@@ -55,6 +55,7 @@ exports.checkSession = function(success, error) {
 				Ti.API.info ( 'Cloud.sessionId: ' + Cloud.sessionId );
 				
 				Ti.App.currentUser = e.users[0];
+				Alloy.Globals.Common.cacheUser();
 				success();
 				
 		    } else {

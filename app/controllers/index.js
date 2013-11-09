@@ -16,7 +16,15 @@ function init() {
 	Alloy.Globals.WinManager = winManager;
 	
 	Alloy.Globals.Common.checkSession(
-		function() { winManager.load('main_window'); 	},
-		function() { winManager.load('analyzing'); 		}
+		function() { 
+			if ( Ti.App.currentUser.photo ) {
+				winManager.load('main_window');	
+			} else {
+				winManager.load('analyzing');
+			}
+		},
+		function() { 
+			winManager.load('analyzing'); 		
+		}
 	);
 }
