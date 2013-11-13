@@ -20,7 +20,7 @@ function loadUserInfo () {
 		
 		$.lbName.text	= custom_fields['name'];
 		$.lbAge.text	= custom_fields['age'];
-		$.lbGender.text	= custom_fields['gender'];
+		$.lbGender.text	= custom_fields['_gender'];
 		$.lblCity.text	= custom_fields['city'];
 	}
 }

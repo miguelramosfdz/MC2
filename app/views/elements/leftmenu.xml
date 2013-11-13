@@ -42,7 +42,7 @@
 		
 		<View class="border"/>
 		
-		<View class="item">
+		<View class="item" url="settings">
 			<ImageView class="icon" image="/images/menu/app_settings.png"/>
 			<Label class="title">App settings</Label>
 		</View>

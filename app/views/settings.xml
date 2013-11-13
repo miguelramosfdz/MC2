@@ -1,0 +1,23 @@
+<Alloy>
+	<View class="page">
+		<Widget id="nav" src="navigation_group"/>
+		<View class="body">
+			
+			<View class="button button-logout" onClick="logout">
+				<ImageView class="button-icon icon-logout"/>
+				<Label class="button-label">Log out</Label>
+			</View>
+			
+			<View class="button button-credits">
+				<ImageView class="button-icon icon-credits"/>
+				<Label class="button-label">Credits</Label>
+			</View>
+			
+			<View class="button button-delete">
+				<ImageView class="button-icon icon-delete"/>
+				<Label class="button-label">Delete Account</Label>
+			</View>
+			
+		</View>
+	</View>
+</Alloy>

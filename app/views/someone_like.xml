@@ -1,6 +1,10 @@
 <Alloy>
 	<View class="page">
 		<Widget id="nav" src="navigation_group"/>
-		<ScrollView id="list" class="body scroll-v"/>
+		<View class="body" onClick="like">
+			<View id="card_0" class="card"/>
+			<View id="card_1" class="card"/>
+			<View id="card_2" class="card"/>
+		</View>
 	</View>
 </Alloy>

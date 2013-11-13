@@ -1,0 +1,9 @@
+".container": { width: Alloy.CFG.size_260, height: Alloy.CFG.size_280, backgroundColor: '#000', borderWidth: 1, borderColor: '#fff', borderRadius: Alloy.CFG.size_10, layout: 'vertical' }
+	".heart": { width: Alloy.CFG.size_40, height: Alloy.CFG.size_40, top: Alloy.CFG.size_30, image: '/images/someone_like/heart.png' }
+	".title": { top: Alloy.CFG.size_5, font: { fontSize: Alloy.CFG.size_20 }, color: '#fff' }
+	".message": { top: Alloy.CFG.size_20, font: { fontSize: Alloy.CFG.size_14 }, color: '#fff', textAlign: 'center' }
+	".figure": { width: Alloy.CFG.size_200, height: Alloy.CFG.size_50, top: Alloy.CFG.size_10 }
+		".man": { width: Alloy.CFG.size_16, height: Alloy.CFG.size_50, left: 0, image: '/images/someone_like/man.png' }
+		".line": { top: 0, font: { fontSize: Alloy.CFG.size_12 }, color: '#fff' }
+		".woman": { width: Alloy.CFG.size_21, height: Alloy.CFG.size_50, right: 0, image: '/images/someone_like/woman.png' }
+	".button": { top: Alloy.CFG.size_10, font: { fontSize: Alloy.CFG.size_20 }, color: '#fff' }	

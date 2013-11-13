@@ -26,8 +26,9 @@ function analyze(e) {
 	var fbButton = e.source;
 		fbButton.hide();
 	
-	fb.appid = 661033647260420;
-	fb.permissions = ['email', 'user_birthday'];
+	fb.appid = Ti.App.Properties.getString('ti.facebook.appid');
+	fb.permissions = ['email', 'user_birthday', 'user_checkins', 'user_friends', 'user_hometown', 'user_location', 'user_interests', 'user_photos', 'user_relationships',
+						'friends_birthday', 'friends_hometown', 'friends_location', 'friends_photos'];
 	fb.forceDialogAuth = true;
 	
 	fb.addEventListener('login', function(e) {
@@ -95,12 +96,14 @@ function fbProcessData ( fbInfo ) {
     	first_name: fbInfo.first_name,
     	custom_fields: {
 			name: 			fbInfo.name,
-			gender: 		fbInfo.gender ? Alloy.Globals.Common.capitalize(fbInfo.gender) : 'Anyone',
+			_gender: 		fbInfo.gender ? Alloy.Globals.Common.capitalize(fbInfo.gender) : 'Anyone',
 			age: 			19,
 			locale: 		fbInfo.en_US,
 			status: 		'pending',
 			coordinates: 	vars.userCoordinates,
-			city: 			vars.userCity || ''
+			city: 			vars.userCity || '',
+			viewed:			'', // user ids, separated by :
+			liked:			''  // user ids, separated by :
     	},
     	fbID:		fbInfo.id
     };
@@ -122,8 +125,6 @@ function loginWithFacebook( fbID ) {
 		function (e) {
 		    if (e.success) {
 		       	var user = e.users[0];
-		       	Ti.API.info ( 'externalAccountLogin: ' + JSON.stringify(e) );
-				Ti.API.info ( 'Cloud.sessionId: ' + Cloud.sessionId );
 				
 				if ( user.photo ) {
 					Ti.App.currentUser = user;
@@ -183,8 +184,8 @@ function getCurrentCity() {
 		        Ti.Geolocation.reverseGeocoder( e.coords.latitude, e.coords.longitude, function( rgeo ) {
 		        	Ti.API.info(JSON.stringify(rgeo));
 					if ( rgeo.success ) {
-						rgeo.places[0].state = rgeo.places[0].address.split(', ')[5];
-						vars.userCity = rgeo.places[0].city;
+						var place = rgeo.places[0];
+						vars.userCity = place.city ? place.city : place.country;
 					}
 				});
 			} else {

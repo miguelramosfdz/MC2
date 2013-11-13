@@ -1,0 +1,13 @@
+<Alloy>
+	<View class="container">
+	    <ImageView class="heart"/>
+	    <Label class="title">She liked you too!</Label>
+	    <Label class="message">When you two are nearby, \n MeetCute will help you cross paths.</Label>
+	    <View class="figure">
+	    	<ImageView class="man"/>
+	    	<Label class="line">....................................</Label>
+	    	<ImageView class="woman"/>
+	    </View>
+	    <Label class="button" onClick="cont">Continue</Label>
+	</View>
+</Alloy>
