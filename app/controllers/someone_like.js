@@ -98,7 +98,8 @@ function loadCard(dataIndex, containerIndex) {
 		card.add( Ti.UI.createButton({ userId: user.id, liked: user.custom_fields.liked, backgroundImage: '/images/someone_like/love.png', width: Alloy.CFG.size_70, height: Alloy.CFG.size_63, bottom: Alloy.CFG.size_60 }) );
 	
 	var container = $['card_' + containerIndex];
-		container.add(card);
+	container.userId = user.id;
+	container.add(card);
 }
 
 function listSwipe(e) {
