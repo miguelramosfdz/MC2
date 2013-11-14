@@ -21,16 +21,21 @@ function loadUserInfo () {
 		$.lbName.text	= custom_fields['name'];
 		$.lbAge.text	= custom_fields['age'];
 		$.lbGender.text	= custom_fields['_gender'];
-		$.lblCity.text	= custom_fields['city'];
 	}
+}
+
+function onScrollend(e) {
+  	$.lblContinue.animate({
+  		opacity: e.currentPage != 2 ? 0 : 1,
+  		duration: 500
+  	});
 }
 
 // PREFIX TOGGLE
 
 function togglePrefix(e) {
-  	var v = e.source.text;
-  	
-  	e.source.text = ((v == 'After:') ? 'Before:' : 'After:'); 
+  	var element = e.source.children[0];
+  	element.text = ((element.text == 'After:') ? 'Before:' : 'After:'); 
 }
 
 // TIME PICKER
@@ -52,13 +57,14 @@ function setTime(time) {
 // SEX TOGGLE
 
 function toggleSex(e) {
-	vars.target = e.source;
+	var element = e.source.children[0];
+	vars.target = element;
   	
   	var data = [{ title: 'Male' }, { title: 'Female' }, { title: 'Anyone' }],
 	  	values = [];
   	
   	for(var i=0,ii=data.length; i<ii; i++){
-		if (e.source.text == data[i].title) {
+		if (element.text == data[i].title) {
 			values[0] = i;
 			break;
 		}
@@ -112,7 +118,9 @@ function updateAccount ( e ) {
 				Ti.App.currentUser = e.users[0];
 				
 				Alloy.Globals.Common.cacheUser();
-				Alloy.Globals.WinManager.load('main_window');
+				Alloy.Globals.WinManager.load({
+					url: 'main_window'
+				});
 	       	}
 	    } else {
 	        Alloy.Globals.Common.showDialog({

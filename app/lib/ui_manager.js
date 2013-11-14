@@ -1,13 +1,32 @@
 var Alloy = require('alloy');
 
 /*
- onLoad = function(params) {};
- onDestroy = function(params) {};
+ onChange = function(status, params, UI) {
+ 	status: ui's status
+ 	 - 0: before
+ 	 - 1: ui created
+ 	 - 2: ui destroy
+ 	
+ 	UI: ui object, if status is 0, UI is null
+ 	
+	params = {
+		url: '',
+		data: {},
+		isReset: false,
+		controller: exports // if status is 0, controller is null
+	}
+
+	controller may have the following functions
+	 - cleanup: called when window loose focus
+	 - reload: called when window focus again
+	 - unload: called when window closed
+	 - androidback: back event for android
+ };
  * */
-function UIManager(args) {
-	var cache = [],
-		onLoad = args.onLoad || emptyFunction,
-		onDestroy = args.onDestroy || emptyFunction;
+function UIManager(onChange) {
+	var cache = [];
+	
+	(onChange == null) && (onChange = emptyFunction);
 	
 	// PRIVATE FUNCTIONS ========================================================
 	
@@ -20,6 +39,8 @@ function UIManager(args) {
 	  - isReset: remove previous object or not, default is true
 	 * */
 	function set(params) {
+		if (onChange(0, params) === false) { return; }
+		
 		// cleanup previous
 		if (cache.length) {
 			cache[cache.length - 1].controller.cleanup();
@@ -35,27 +56,26 @@ function UIManager(args) {
 		
 		params.controller = controller;
 		
-		/*
-		 controller may have the following functions
-		  - cleanup: called when window loose focus
-		  - reload:  called when window focus again
-		  - unload:  called when window closed
-		  - androidback: back event for android
-		 * */
-		
-		// callback event
-		onLoad(params);
-		
 		// remove previous
-		(params.isReset != false) && reset();
+		(params.isReset !== false) && reset();
 		
 		// cached new
 		cache.push(params);
+		
+		var view = controller.getView();
+		
+		onChange(1, params, view);
+		
+		return view;
 	};
 	
-	function destroyObject(obj) {
-		obj.controller.unload();
-		onDestroy(obj);
+	function destroyObject(params) {
+		var controller = params.controller;
+		
+		controller.cleanup();
+		controller.unload();
+		
+		onChange(2, params, controller.getView());
 	}
 	
 	/*

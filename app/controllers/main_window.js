@@ -18,11 +18,12 @@ function loadHomepage( args ) {
 	
 	var container = Ti.UI.createView({  });
 	
-	var pageManager = require('page_manager');
+	var oPageManager = require('page_manager');
+		pageManager = new oPageManager();
   	
 	pageManager.init({
-		container: container,
 		onChange: onChange,
+		container: container,
 		defaultPage: 'someone_like'
 	});
 		
@@ -61,7 +62,7 @@ function hideSlideMenu(e) {
 function onChange(status, data) {
 	if (status == 0) {
 		Alloy.Globals.toggleAI(true);
-	} else if (status == 2) {
+	} else if (status == 1) {
 		Alloy.Globals.toggleAI(false);
 	}
 }

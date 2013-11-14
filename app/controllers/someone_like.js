@@ -20,6 +20,31 @@ function init() {
   	$.card_2.height = height;
   	$.card_2.top = 2 * height;
   	
+  	var photoSize = 1024,
+  		photoPath = 'large_1024';
+  	if (OS_ANDROID) {
+  		var width = Ti.Platform.displayCaps.platformWidth,
+  			sizes = [
+  				{ width: 240,  path: 'small_240' },
+  				{ width: 500,  path: 'medium_500' },
+  				{ width: 640,  path: 'medium_640' },
+  				{ width: 1024, path: 'large_1024' }
+  			];
+  		for(var i=0,ii=sizes.length; i<ii; i++){
+			var size = sizes[i];
+			if (width < size.width) {
+				photoSize = size.width;
+				photoPath = size.path;
+				break;
+			}
+		};	
+  	} else {
+  		photoSize = 320;
+  		photoPath = 'medium_640';
+  	}
+  	vars.photoPath = photoPath;
+  	vars.photoSize = photoSize;
+  	
   	getFeeds();
 }
 
@@ -67,7 +92,6 @@ function getFeeds() {
 }
 
 function getFeedError() {
-  	alert('Error');
 }
 
 function loadFeeds(users) {
@@ -88,13 +112,15 @@ function loadFeeds(users) {
 	  	vars.swipeEnable = true;
 	  	$.card_0.parent.addEventListener('swipe', listSwipe);
 	}
+	
+	Alloy.Globals.toggleAI(false);
 }
 
 function loadCard(dataIndex, containerIndex) {
 	var user = vars.users[dataIndex];
 	
 	var card = Ti.UI.createView();
-		card.add( Ti.UI.createImageView({ image: user.photo.urls.medium_640, width: Alloy.CFG.size_320 }) );
+		card.add( Ti.UI.createImageView({ image: user.photo.urls[vars.photoPath], width: vars.photoSize }) );
 		card.add( Ti.UI.createButton({ userId: user.id, liked: user.custom_fields.liked, backgroundImage: '/images/someone_like/love.png', width: Alloy.CFG.size_70, height: Alloy.CFG.size_63, bottom: Alloy.CFG.size_60 }) );
 	
 	var container = $['card_' + containerIndex];

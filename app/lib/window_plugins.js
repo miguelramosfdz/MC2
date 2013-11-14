@@ -1,17 +1,16 @@
 var Alloy = require('alloy');
 
-exports.onChange = function(status, params) {
+exports.onChange = function(status, params, win) {
 	var oSwitch = {
-		0: onLoad,
-		2: onLoadFinish,
-		3: onClose
+		0: winBeforeLoad,
+		1: winLoaded,
+		2: winDestroy
 	};
-	var fnc = oSwitch[status];
-	fnc && fnc(params);
+	return oSwitch[status](params, win);
 };
 
-function onLoad(params) {
-  	var current = Alloy.Globals.WinManager.getCache(-1);
+function winBeforeLoad(params) {
+	var current = Alloy.Globals.WinManager.getCache(-1);
   	
   	// first load, current is null
   	if (current) {
@@ -25,27 +24,31 @@ function onLoad(params) {
   	}
 }
 
-function onLoadFinish(params) {
-	var current = Alloy.Globals.WinManager.getCache(-1), // at this point, current is not null
-  		win = current.controller.getView();
+function winLoaded(params, win) {
+	var controller = params.controller;
 	
 	// attach AI
 	
-  	var ai = Alloy.createController('elements/ai');
+  	var ai = Alloy.createController('elements/ai', { visible: false });
 	win.add( ai.getView() );
-	current.ai = ai;
+	params.ai = ai;
 	
 	// attach hidden textfield for hiding keyboard
 	
 	var hiddenTextfield = Ti.UI.createTextField({ visible: false });
 	win.add(hiddenTextfield);
-	current.hiddenTextfield = hiddenTextfield;
+	params.hiddenTextfield = hiddenTextfield;
 }
 
-function onClose(params) {
-  	params.ai.unload();
+function winDestroy(params, win) {
+	params.ai.unload();
   	params.ai = null;
   	params.hiddenTextfield = null;
+}
+
+function windowClosed(e) {
+  	Alloy.Globals.WinManager.getCache(-1).isOpened = false;
+  	Alloy.Globals.WinManager.loadPrevious();
 }
 
 exports.toggleAI = function(visible, message, timeout) {

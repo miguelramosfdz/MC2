@@ -1,71 +1,85 @@
 <Alloy>
 	<Window class="win">
-		<ScrollableView class="page">
-			<!-- view 1 -->
-			<View>
-				<View class="wrapper">
-					<Label id="lbName" class="title">Amelia</Label>
-					<View class="row margin">
-						<Label class="label">Age:</Label>
-						<Label id="lbAge" class="value">24</Label>
-					</View>
-					<View class="row">
-						<Label class="label">Sex:</Label>
-						<Label id="lbGender" class="value">Female</Label>
-					</View>
-					<Label class="label margin">Current City:</Label>
-					<Label id="lblCity" class="value value-city">San Francisco</Label>
-				</View>
-			</View>
-			
-			<!-- view 2 -->
-			<View>
-				<View class="wrapper">
-					<Label class="title">When are you typically busy?</Label>
-					
-					<Label class="label margin">Weekdays</Label>
-					<View class="row">
-						<Label id='lbBusyText' class="value time-prefix" onClick="togglePrefix">Before:</Label>
-						<Label id='lbBusyValue' class="value" onClick="showTimePicker">6:59AM</Label>
-					</View>
-					
-					<Label class="label margin">Weekends</Label>
-					<View class="row">
-						<Label id='lbWeekendsText' class="value time-prefix" onClick="togglePrefix">After:</Label>
-						<Label id='lbWeekendsValue' class="value" onClick="showTimePicker">10:59PM</Label>
+		<View class="page">
+		
+			<ScrollableView class="scroller" onScrollend="onScrollend">
+				<!-- view 1 -->
+				<View>
+					<View class="wrapper">
+						<Label id="lbName" class="h2 center">Amelia</Label>
+						<View class="row">
+							<Label class="h2 label">Age:</Label>
+							<Label id="lbAge" class="h2 value">24</Label>
+						</View>
+						<View class="row">
+							<Label class="h2 label">Sex:</Label>
+							<Label id="lbGender" class="h2 value">Female</Label>
+						</View>
+						<Label class="h3 margin center">*All info gathered from Facebook, \n if inaccurate, please update on Facebook.</Label>
 					</View>
 				</View>
 				
-				<Label class="intro">*MeetCute will not send notifications when you are typically busy, nor any later than 10:59PM and no earlier than 6:59AM local time.</Label>
-			</View>
-			
-			<!-- view 3 -->
-			<View>
-				<View class="wrapper">
-					<Label class="title">Who would you like to \ncross paths with?</Label>
-					<View class="row margin">
-						<Label class="label">Sex:</Label>
-						<Label id="lbTargetGender" class="value" onClick="toggleSex">Anyone</Label>
-					</View>
-					<View class="row">
-						<Label class="label">Age range:</Label>
-						<Label class="value" onClick="showAgePicker" id="ageFrom">20</Label>
-						<Label class="value">-</Label>
-						<Label class="value" onClick="showAgePicker" id="ageTo">25</Label>
+				<!-- view 2 -->
+				<View>
+					<View class="wrapper">
+						<Label class="h2 center">When are you typically busy?</Label>
+						
+						<Label class="h2 label margin label-time">Weekdays</Label>
+						<View class="row row-time">
+							<View class="toggle" onClick="togglePrefix">
+								<Label id='lbBusyText' class="h2 toggle-label">Before:</Label>
+								<ImageView class="toggle-arrow"/>
+							</View>
+							<Label id='lbBusyValue' class="h2-bold value toggle-value" onClick="showTimePicker">6:59AM</Label>
+						</View>
+						
+						<Label class="h2 label margin label-time">Weekends</Label>
+						<View class="row row-time">
+							<View class="toggle" onClick="togglePrefix">
+								<Label id='lbWeekendsText' class="h2 toggle-label">After:</Label>
+								<ImageView class="toggle-arrow"/>
+							</View>
+							<Label id='lbWeekendsValue' class="h2-bold value toggle-value" onClick="showTimePicker">10:59PM</Label>
+						</View>
 					</View>
 					
-					<!--
-					http://developer.appcelerator.com/question/154984/range-seekbar
-					https://github.com/Larpon/RangeSeekBar
-					https://code.google.com/p/range-seek-bar/	
-					-->
-					<Slider id="ageSlider" class="slider" onChange="setAge"/>
-					
+					<Label class="h3 intro">..................................................................................... \n *MeetCute will not send notifications when you are typically busy, nor any later than 10:59PM and no earlier than 6:59AM local time.</Label>
 				</View>
 				
-				<Label class="intro final-intro" onClick="updateAccount">To Be Continued...</Label>
+				<!-- view 3 -->
+				<View>
+					<View class="wrapper">
+						<Label class="h2 center">Who would you like to \ncross paths with?</Label>
+						<View class="row margin">
+							<Label class="h2 label">Sex:</Label>
+							<View class="toggle toggle-h" onClick="toggleSex">
+								<Label id='lbTargetGender' class="h2-bold value toggle-label-h">Anyone</Label>
+								<ImageView class="toggle-arrow-h"/>
+							</View>
+						</View>
+						<View class="row">
+							<Label class="h3 label">Age range:</Label>
+							<Label class="h3 value" onClick="showAgePicker" id="ageFrom">20</Label>
+							<Label class="h3 value age-value"> - </Label>
+							<Label class="h3 value age-value" onClick="showAgePicker" id="ageTo">25</Label>
+						</View>
+						
+						<!--
+						http://developer.appcelerator.com/question/154984/range-seekbar
+						https://github.com/Larpon/RangeSeekBar
+						https://code.google.com/p/range-seek-bar/	
+						-->
+						<Slider id="ageSlider" class="slider" onChange="setAge"/>
+					</View>
+				</View>
+			</ScrollableView>
+		
+			<View id="lblContinue" onClick="updateAccount">
+				<Label class="h3-bold label-continue">To Be Continued...</Label>
+				<Label class="h3-bold label-continue-2">V</Label>
 			</View>
-		</ScrollableView>
+		
+		</View>
 		
 		<!-- time picker -->
 		<Require id="timePicker" src="elements/time_picker"/>

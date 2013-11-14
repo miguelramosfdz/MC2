@@ -1,21 +1,34 @@
-".page": { showPagingControl: true }
+".scroller": { bottom: Alloy.CFG.size_50, showPagingControl: true }
 	".wrapper": { top: Alloy.CFG.size_100, left: Alloy.CFG.size_20, right: Alloy.CFG.size_20, layout: 'vertical' }
-		".title": { font: { fontSize: Alloy.CFG.size_20 }, color: '#fff', textAlign: 'center' }
+		".center": { textAlign: 'center' }
 		".margin": { top: Alloy.CFG.size_20 }
 		".row": { width: Ti.UI.SIZE, height: Ti.UI.SIZE, layout: 'horizontal' }
-			".label": { font: { fontSize: Alloy.CFG.size_16 }, color: '#fff' }
-			".value": { left: Alloy.CFG.size_10, font: { fontSize: Alloy.CFG.size_18, fontWeight: 'bold' }, color: '#fff' }
-		".intro": { bottom: Alloy.CFG.size_20, left: Alloy.CFG.size_10, right: Alloy.CFG.size_10, font: { fontSize: Alloy.CFG.size_12 }, color: '#999' }
+			".label": { color: '#ccc' }
+			".value": { left: Alloy.CFG.size_5/*, shadowColor: '#fff', shadowOffset: { x: 1, y: 1 }*/ }
+		".intro": { bottom: Alloy.CFG.size_10, left: Alloy.CFG.size_10, right: Alloy.CFG.size_10, color: '#999' }
 		
 		/* view 1 */	
-		".value-city": { right: Alloy.CFG.size_10, textAlign: 'center' }
 		
 		/* view 2 */
-		".time-prefix": { left: 0 }
-		
+		".label-time": { left: 0, color: '#999' }
+		".row-time": { left: 0}
+			".toggle": { width: Ti.UI.SIZE, height: Ti.UI.SIZE, top: 0, left: 0, layout: 'vertical' }
+				".toggle-label": { touchEnabled: false }
+				".toggle-arrow": { width: Alloy.CFG.size_12, height: Alloy.CFG.size_10, top: Alloy.CFG.size__7, image: '/images/analyzing/triangle.png', touchEnabled: false }
+				".toggle-arrow[platform=android]": { top: Alloy.CFG.size__5 }
+			".toggle-h": { layout: 'horizontal' }	
+				".toggle-label-h": { touchEnabled: false }
+				".toggle-arrow-h": { width: Alloy.CFG.size_10, height: Alloy.CFG.size_17, left: Alloy.CFG.size_3, image: '/images/analyzing/triangle2.png', touchEnabled: false }
+				".toggle-arrow-h[platform=ios]": { top: Alloy.CFG.size_2 }
+			".toggle-value": { top: 0 }	
+				
 		/* view 3 */
-		".slider": { visible: false, top: 10, min: 19, max: 34 }
-		".final-intro": { textAlign: 'center' }
+		".age-value": { left: 0 }
+		".slider": { visible: false, top: Alloy.CFG.size_10, min: 19, max: 34 }
+		
+"#lblContinue": { opacity: 0, height: Ti.UI.SIZE, bottom: Alloy.CFG.size_10, layout: 'vertical' }
+	".label-continue": { color: '#999' }
+	".label-continue-2": { top: Alloy.CFG.size__3, color: '#999' }
 		
 ".city-picker": { top: 0, visible: false, backgroundColor: '#fff' }
 

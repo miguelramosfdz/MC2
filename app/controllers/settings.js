@@ -32,7 +32,9 @@ function logout() {
 	    	Ti.App.Properties.setObject('currentUser', false );
 	    	Ti.App.currentUser = false;
 	    	
-	        Alloy.Globals.WinManager.reset('analyzing');
+	        Alloy.Globals.WinManager.load({
+	        	url: 'analyzing'
+	        });
 	    } else {
 	        Alloy.Globals.Common.showDialog({
 	        	title:		'Logout Error',

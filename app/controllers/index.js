@@ -7,24 +7,27 @@ function init() {
 	
 	// initialize window manager
 	
-	var winManager = require('window_manager');
-		
-	winManager.init({
-		onChange: WinPlugins.onChange
-	});
+	var oWindowManager = require('window_manager'),
+		winManager = new oWindowManager( WinPlugins.onChange );
 	
 	Alloy.Globals.WinManager = winManager;
 	
 	Alloy.Globals.Common.checkSession(
 		function() { 
 			if ( Ti.App.currentUser.photo ) {
-				winManager.load('main_window');	
+				winManager.load({
+					url: 'main_window'
+				});	
 			} else {
-				winManager.load('analyzing');
+				winManager.load({
+					url: 'analyzing'
+				});
 			}
 		},
 		function() { 
-			winManager.load('analyzing'); 		
+			winManager.load({
+				url: 'analyzing'
+			}); 		
 		}
 	);
 }

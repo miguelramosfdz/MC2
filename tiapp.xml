@@ -41,6 +41,11 @@
             <dict>
                 <key>UIStatusBarStyle</key>
                 <string>UIStatusBarStyleLightContent</string>
+                <key>UIAppFonts</key>
+	            <array>
+	                <string>fonts/AGaramondPro-Regular.otf</string>
+	                <string>fonts/AGaramondPro-Bold.otf</string>
+	            </array>
             </dict>
         </plist>
     </ios>

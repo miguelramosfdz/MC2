@@ -1,8 +1,6 @@
 var Cloud = require('ti.cloud');
 	Cloud.debug = true;
 	
-var customFields = Ti.App.currentUser.custom_fields;	
-
 /**
  * 	1. Filter by: age & _gender & !viewed 
 		Order by geo location. Limit 20
@@ -12,9 +10,13 @@ var customFields = Ti.App.currentUser.custom_fields;
 		http://docs.appcelerator.com/cloud/latest/#!/api/SocialIntegrations-method-facebook_search_friends 
  */
 exports.loadFeeds = function(excludedUserIDS, success, error) {
+	var customFields = Ti.App.currentUser.custom_fields;
+	
 	// exclude current user and FB Friends + viewed photo
 	excludedUserIDS.push( Ti.App.currentUser.id );
 	
+	// TODO: Comment out filter for now
+	/*
 	if ( customFields.viewed ) {
 		var viewed = customFields.viewed.split(':');
 		
@@ -22,18 +24,22 @@ exports.loadFeeds = function(excludedUserIDS, success, error) {
 			excludedUserIDS = excludedUserIDS.concat( viewed );	
 		}
 	}
+	*/
 	
 	var filter = {
 		"id": 			{ "$nin": excludedUserIDS }, 				 
 		"first_name":	{ "$exists" : true },						// to make sure matchers have photo
-		"$and": 		[ { "age": {"$gte": customFields.like_age_from} }, { "age": {"$lte": customFields.like_age_to} } ],
-		"coordinates": 	{ "$nearSphere": customFields.coordinates[0] }
+		// TODO: Comment out filter for now
+		// "$and": 		[ { "age": {"$gte": customFields.like_age_from} }, { "age": {"$lte": customFields.like_age_to} } ],
         // status:		'active'									// TODO - Enable this filter after completing the admin dashboard to approve photo
    	};
-   
+	   
+   	// TODO: Comment out filter for now
+   	/*
    	if ( customFields.like_gender != 'Anyone' ) {
 		filter['_gender'] = customFields.like_gender;    	
    	}
+   	*/
    	
    	// order by coordinates
    	if ( customFields.coordinates && customFields.coordinates.length ) {
@@ -76,27 +82,29 @@ exports.searchFacebookFriends = function(success, error) {
  * Mark photo as viewed
  */
 function onViewPhoto( userId, isLiked ) {
+	if ( !userId ) {
+		return;
+	}
+	
+	var customFields = Ti.App.currentUser.custom_fields;
+	
 	// viewed
 	var viewed = customFields.viewed;
 		if ( !viewed ) {
-			viewed = [userId];
+			viewed = userId;
 		} else {
-			viewed = viewed.split(':');
-			viewed.push(userId);
+			viewed += ':' + userId;
 		}
-		viewed = viewed.join(':');
 		
 	// liked
 	var liked;
 	if ( isLiked ) {
 		liked = customFields.liked;
-			if ( !liked ) {
-				liked = [userId];
-			} else {
-				liked = liked.split(':');
-				liked.push(userId);
-			}
-			liked = liked.join(':');
+		if ( !liked ) {
+			liked = userId;
+		} else {
+			liked += ':' + userId;
+		}
 	}
 	
 	Cloud.Users.update(

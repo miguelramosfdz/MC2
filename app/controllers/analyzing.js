@@ -100,8 +100,6 @@ function fbProcessData ( fbInfo ) {
 			age: 			19,
 			locale: 		fbInfo.en_US,
 			status: 		'pending',
-			coordinates: 	vars.userCoordinates,
-			city: 			vars.userCity || '',
 			viewed:			'', // user ids, separated by :
 			liked:			''  // user ids, separated by :
     	},
@@ -110,6 +108,9 @@ function fbProcessData ( fbInfo ) {
     
 	if ( fbInfo.birthday ) {
 		currentUser['custom_fields']['age'] = new Date().getFullYear() - parseInt( fbInfo.birthday.split('/')[2], 10);
+	}
+	if ( vars.userCoordinates ) {
+		currentUser['custom_fields']['coordinates'] = vars.userCoordinates;
 	}
 	
 	loginWithFacebook ( fbInfo.id );
@@ -167,9 +168,14 @@ function playMovie(e) {
 		vars.loadingMovie.play();
 	} else {
 		if (vars.finishLoading === 1) {
-			Alloy.Globals.WinManager.load('main_window');
+			Alloy.Globals.WinManager.load({
+				url: 'main_window'
+			});
 		} else {
-			Alloy.Globals.WinManager.load('analyze_result', currentUser);
+			Alloy.Globals.WinManager.load({
+				url: 'analyze_result',
+				data: currentUser
+			});
 		}
 	}
 }
@@ -180,14 +186,6 @@ function getCurrentCity() {
 	    Ti.Geolocation.getCurrentPosition(function( e ) {
 	    	if ( e.success ) {
 	    		vars.userCoordinates = [e.coords.longitude, e.coords.latitude];
-	    		
-		        Ti.Geolocation.reverseGeocoder( e.coords.latitude, e.coords.longitude, function( rgeo ) {
-		        	Ti.API.info(JSON.stringify(rgeo));
-					if ( rgeo.success ) {
-						var place = rgeo.places[0];
-						vars.userCity = place.city ? place.city : place.country;
-					}
-				});
 			} else {
 				Alloy.Globals.Common.showDialog({
 		            title:		'Warning',
