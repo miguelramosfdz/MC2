@@ -1,6 +1,6 @@
 <Alloy>
 	<ScrollView class="container scroll-v" onClick="menuClicked">
-		<View class="item">
+		<View class="item" url="cross_paths">
 			<ImageView class="icon" image="/images/menu/cross_paths.png"/>
 			<Label class="title">Cross paths</Label>
 		</View>

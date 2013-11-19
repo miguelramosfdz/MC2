@@ -29,7 +29,7 @@ function winLoaded(params, win) {
 	
 	// attach AI
 	
-  	var ai = Alloy.createController('elements/ai', { visible: false });
+  	var ai = Alloy.createController('elements/ai', { visible: true });
 	win.add( ai.getView() );
 	params.ai = ai;
 	

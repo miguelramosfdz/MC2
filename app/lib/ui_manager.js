@@ -17,9 +17,10 @@ var Alloy = require('alloy');
 	}
 
 	controller may have the following functions
+	 - init:    called when window loaded, after onChange(1) run
 	 - cleanup: called when window loose focus
-	 - reload: called when window focus again
-	 - unload: called when window closed
+	 - reload:  called when window focus again
+	 - unload:  called when window closed
 	 - androidback: back event for android
  };
  * */
@@ -42,9 +43,7 @@ function UIManager(onChange) {
 		if (onChange(0, params) === false) { return; }
 		
 		// cleanup previous
-		if (cache.length) {
-			cache[cache.length - 1].controller.cleanup();
-		}
+		cache.length && cache[cache.length - 1].controller.cleanup();
 		
 		// load new
 		var controller = Alloy.createController(params.url, params.data);
@@ -65,6 +64,8 @@ function UIManager(onChange) {
 		var view = controller.getView();
 		
 		onChange(1, params, view);
+		
+		controller.init && controller.init(params); 
 		
 		return view;
 	};

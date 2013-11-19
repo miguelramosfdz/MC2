@@ -1,0 +1,6 @@
+<Alloy>
+	<View id="slider" class="range-slider" onPostlayout="postlayout">
+	    <ImageView id="thumb_1" class="range-slider-thumb thumb_1" onTouchstart="touchstart" onTouchmove="touchmove" onTouchend="touchend" onTouchcancel="touchcancel"/>
+	    <ImageView id="thumb_2" class="range-slider-thumb thumb_2" onTouchstart="touchstart" onTouchmove="touchmove" onTouchend="touchend" onTouchcancel="touchcancel"/>
+	</View>
+</Alloy>

@@ -24,11 +24,12 @@
 				
 		/* view 3 */
 		".age-value": { left: 0 }
-		".slider": { visible: false, top: Alloy.CFG.size_10, min: 19, max: 34 }
 		
 "#lblContinue": { opacity: 0, height: Ti.UI.SIZE, bottom: Alloy.CFG.size_10, layout: 'vertical' }
 	".label-continue": { color: '#999' }
 	".label-continue-2": { top: Alloy.CFG.size__3, color: '#999' }
+
+"#sliderContainer": { opacity: 0, width: Ti.UI.SIZE, height: Ti.UI.SIZE, top: Alloy.CFG.size_260 }
 		
 ".city-picker": { top: 0, visible: false, backgroundColor: '#fff' }
 

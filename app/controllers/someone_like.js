@@ -1,14 +1,12 @@
 var vars = {},
 	Api = require('api');
 
-init();
-
-function init() {
+exports.init = function() {
   	loadNav();
   	
   	//
   	
-  	var height = Math.floor( (Alloy.CFG.screenHeight - 44 /*nav*/) * 70 / 100 ); // 70% of available height
+  	var height = Alloy.CFG.size_380; // Math.floor( (Alloy.CFG.screenHeight - 44 /*nav*/) * 90 / 100 ); // 90% of available height
   	vars.height = height;
   	
   	$.card_0.height = height;
@@ -20,8 +18,7 @@ function init() {
   	$.card_2.height = height;
   	$.card_2.top = 2 * height;
   	
-  	var photoSize = 1024,
-  		photoPath = 'large_1024';
+  	var photoPath = 'large_1024';
   	if (OS_ANDROID) {
   		var width = Ti.Platform.displayCaps.platformWidth,
   			sizes = [
@@ -33,31 +30,32 @@ function init() {
   		for(var i=0,ii=sizes.length; i<ii; i++){
 			var size = sizes[i];
 			if (width < size.width) {
-				photoSize = size.width;
 				photoPath = size.path;
 				break;
 			}
 		};	
   	} else {
-  		photoSize = 320;
   		photoPath = 'medium_640';
   	}
   	vars.photoPath = photoPath;
-  	vars.photoSize = photoSize;
   	
   	getFeeds();
-}
+};
 
 function loadNav() {
-  	var btnMenu = Ti.UI.createButton({ width: Alloy.CFG.size_31, height: Alloy.CFG.size_28, backgroundImage: '/images/nav/btn-menu.png' });
-	btnMenu.addEventListener('click', function(){
-		Alloy.Globals.SlidingMenu.toggleLeftDrawer();
-	});
+	var btnMenu = Alloy.createController('elements/button', {
+		icon: { width: Alloy.CFG.size_16, height: Alloy.CFG.size_15, backgroundImage: '/images/nav/btn-menu.png' },
+		callback: function() {
+		  	Alloy.Globals.SlidingMenu.toggleLeftDrawer();
+		}
+	}).getView();
 	
-	var btnMap = Ti.UI.createButton({ width: Alloy.CFG.size_50, height: Alloy.CFG.size_50, backgroundImage: '/images/nav/btn-map.png' });
-	btnMap.addEventListener('click', function(){
-		alert('TODO');
-	});
+	var btnMap = Alloy.createController('elements/button', {
+		icon: { width: Alloy.CFG.size_28, height: Alloy.CFG.size_23, backgroundImage: '/images/nav/btn-map.png' },
+		callback: function(){
+			alert('TODO');
+		}
+	}).getView();
 	
   	$.nav.init({
   		title: 'SOMEONE LIKE',
@@ -120,8 +118,9 @@ function loadCard(dataIndex, containerIndex) {
 	var user = vars.users[dataIndex];
 	
 	var card = Ti.UI.createView();
-		card.add( Ti.UI.createImageView({ image: user.photo.urls[vars.photoPath], width: vars.photoSize }) );
-		card.add( Ti.UI.createButton({ userId: user.id, liked: user.custom_fields.liked, backgroundImage: '/images/someone_like/love.png', width: Alloy.CFG.size_70, height: Alloy.CFG.size_63, bottom: Alloy.CFG.size_60 }) );
+		card.add( Ti.UI.createImageView({ image: user.photo.urls[vars.photoPath], width: Alloy.CFG.size_280, height: Alloy.CFG.size_280, top: 0 }) );
+		card.add( Ti.UI.createImageView({ image: '/images/someone_like/gradient.png', width: Alloy.CFG.size_280, height: Alloy.CFG.size_280, top: 0 }) );
+		card.add( Ti.UI.createButton({ userId: user.id, gender: user.custom_fields._gender, liked: user.custom_fields.liked, opacity: 0.5, backgroundImage: '/images/someone_like/love.png', width: Alloy.CFG.size_70, height: Alloy.CFG.size_63, top: Alloy.CFG.size_255 }) );
 	
 	var container = $['card_' + containerIndex];
 	container.userId = user.id;
@@ -189,24 +188,38 @@ function like(e) {
 	var photo = e.source;
 		
   	if ( photo.userId != null ) {
-  		Api.onLikePhoto( photo.userId );
+  		photo.animate({ opacity: 1, duration: 300 });
   		
-  		if ( photo.liked.indexOf( Ti.App.currentUser.id ) == -1 ) {
-			loadAnimation(photo.parent);
-		} else {
-			photo.parent.add( Alloy.createController('elements/someone_like/match_found').getView() );				
-		}
+  		if (photo.isLiked != true) {
+  			photo.isLiked = true;
+  			
+  			Api.onLikePhoto( photo.userId );
+  		
+	  		if ( photo.liked.indexOf( Ti.App.currentUser.id ) == -1 ) {
+				loadAnimation(photo.parent, photo.gender);
+			} else {
+				photo.parent.add( Alloy.createController('elements/someone_like/match_found', { gender: photo.gender }).getView() );				
+			}
+  		} else {
+  			vars.likeMessage.animate({ opacity: 0, duration: 500 }, function() {
+				var message = vars.likeMessage;
+				message.parent.remove(message);
+				vars.likeMessage = null;
+			});
+  		}
   	}
 }
 
-function loadAnimation(container) {
+function loadAnimation(container, gender) {
 	var source = [];
 	for (var i=0; i < 20; i++) { 
 		source.push('/images/animation/' + i + '.jpg'); 
 	};
 		
-  	var wrapper = Ti.UI.createView({ width: Alloy.CFG.size_260, height: Alloy.CFG.size_60, bottom: Alloy.CFG.size_10, backgroundColor: '#000', borderWidth: 1, borderColor: '#fff', borderRadius: Alloy.CFG.size_10 });
-		var image = Ti.UI.createImageView({ images: source, duration: 150, width: Alloy.CFG.size_68, height: Alloy.CFG.size_30, top: Alloy.CFG.size_5 });
+  	var wrapper = Ti.UI.createView({ width: Alloy.CFG.size_260, height: Alloy.CFG.size_60, top: Alloy.CFG.size_315 });
+  	vars.likeMessage = wrapper;
+  	
+		var image = Ti.UI.createImageView({ images: source, duration: 200, width: Alloy.CFG.size_68, height: Alloy.CFG.size_30, top: Alloy.CFG.size_5 });
 		wrapper.add(image);
 		image.start();
 		
@@ -215,17 +228,15 @@ function loadAnimation(container) {
 	container.add(wrapper);	
 	
 	setTimeout(function(){ 
-		image.animate({ opacity: 0, duration: 300 }, function() {
+		image.animate({ opacity: 0, duration: 500 }, function() {
 			image.stop();
 			wrapper.remove(image);
 			image = null; 
 		});
-		message.animate({ opacity: 0, duration: 300 }, function(e) {
-			var message2 = Ti.UI.createLabel({ text: 'MeetCute will help you cross paths with someone like her.', opacity: 0, font: { fontSize: Alloy.CFG.size_13 }, color: '#fff', textAlign: 'center' });
+		message.animate({ opacity: 0, duration: 500 }, function(e) {
+			var message2 = Ti.UI.createLabel({ text: 'MeetCute will help you cross paths with someone like ' + ( ( gender && gender.toLowerCase() == 'female') ? 'her.': 'him.' ), opacity: 0, font: { fontSize: Alloy.CFG.size_13 }, color: '#fff', textAlign: 'center' });
 			wrapper.add(message2);
-			message2.animate({ opacity: 1, duration: 300 });
-			
-			setTimeout(function(){ wrapper.hide(); }, 1000);
+			message2.animate({ opacity: 1, duration: 500 });
 		});
-	}, 1000);
+	}, 2000);
 }

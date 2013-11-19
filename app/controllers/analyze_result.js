@@ -1,9 +1,7 @@
 var vars = {},
 	currentUser = arguments[0] || {};
 	
-init();
-
-function init() {
+exports.init = function() {
 	loadUserInfo();
 	
 	var	pictureUrl = 'https://graph.facebook.com/' + currentUser.fbID + '/picture?width=320&height=320';
@@ -12,23 +10,55 @@ function init() {
     		currentUser['photo'] = res;
     	}
 	});
-}
+	
+	Alloy.Globals.toggleAI(false);
+};
 
-function loadUserInfo () {
+function loadUserInfo() {
 	if ( currentUser.custom_fields ) {
-		var custom_fields = currentUser.custom_fields;
-		
+		var custom_fields = currentUser.custom_fields,
+		    like_age_from = Math.floor( custom_fields['age']/ 2 ) + 7;
+            like_age_to   = custom_fields['age'] + 10;
+        
+        $.ageSlider.setProperties({
+        	min: like_age_from,
+        	max: like_age_to,
+        	values: [like_age_from, like_age_to],
+        	onChange: updateAgeRange
+        });
+        
+        $.ageFrom.text  = like_age_from;
+        $.ageTo.text    = like_age_to;
+        
 		$.lbName.text	= custom_fields['name'];
 		$.lbAge.text	= custom_fields['age'];
 		$.lbGender.text	= custom_fields['_gender'];
 	}
 }
 
+function updateAgeRange(type, value) {
+	if (type == 1) {
+		$.ageFrom.text = value;
+	} else {
+		$.ageTo.text = value;
+	}
+}
+
+function onScroll(e) {
+  	$.lblContinue.opacity = 0;
+  	$.sliderContainer.opacity = 0;
+}
+
 function onScrollend(e) {
-  	$.lblContinue.animate({
-  		opacity: e.currentPage != 2 ? 0 : 1,
-  		duration: 500
-  	});
+	if (e.currentPage == 2) {
+		var animation = Ti.UI.createAnimation({
+	  		opacity: 1,
+	  		duration: 300
+	  	});
+		
+	  	$.lblContinue.animate(animation);
+	  	$.sliderContainer.animate(animation);
+	}
 }
 
 // PREFIX TOGGLE
@@ -80,20 +110,6 @@ function toggleSex(e) {
 function updateSex(values) {
   	vars.target.text = values[0].title;
   	$.valuePicker.hide();
-}
-
-// AGE PICKER
-
-function showAgePicker(e) {
-  	vars.target = e.source;
-	
-	$.ageSlider.value = parseInt(e.source.text, 10);
-	$.ageSlider.show();
-}
-
-function setAge(e) {
-	vars.target && (vars.target.text = Math.floor(e.value));
-  	// $.agePicker.hide();
 }
 
 // update new Account information

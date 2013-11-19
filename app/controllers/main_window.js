@@ -1,5 +1,6 @@
-
-loadHomepage( arguments[0] || {} );
+exports.init = function(params) {
+	loadHomepage( arguments[0] || {} );
+};
 
 exports.cleanup = function() {
 	
@@ -11,6 +12,21 @@ exports.reload = function( params ) {
 
 exports.unload = function() {
 	Alloy.Globals.SlidingMenu = null;
+};
+
+exports.androidback = function() {
+	var cache = Alloy.Globals.PageManager.getCache(),
+		current = cache[cache.length - 1].controller;
+	
+	if (current.androidback && current.androidback() === false) {
+		return false;
+	}
+	
+	
+	if (cache.length > 1) {
+		Alloy.Globals.PageManager.loadPrevious();
+		return false;
+	}
 };
 
 function loadHomepage( args ) {
@@ -62,7 +78,5 @@ function hideSlideMenu(e) {
 function onChange(status, data) {
 	if (status == 0) {
 		Alloy.Globals.toggleAI(true);
-	} else if (status == 1) {
-		Alloy.Globals.toggleAI(false);
 	}
 }

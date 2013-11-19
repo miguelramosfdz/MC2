@@ -1,17 +1,18 @@
 var Cloud = require('ti.cloud');
 	Cloud.debug = true;
 
-init();
-
-function init() {
+exports.init = function() {
   	loadNav();
-}
+  	Alloy.Globals.toggleAI(false);
+};
 
 function loadNav() {
-  	var btnMenu = Ti.UI.createButton({ width: Alloy.CFG.size_31, height: Alloy.CFG.size_28, backgroundImage: '/images/nav/btn-menu.png' });
-	btnMenu.addEventListener('click', function(){
-		Alloy.Globals.SlidingMenu.toggleLeftDrawer();
-	});
+  	var btnMenu = Alloy.createController('elements/button', {
+		icon: { width: Alloy.CFG.size_16, height: Alloy.CFG.size_15, backgroundImage: '/images/nav/btn-menu.png' },
+		callback: function() {
+		  	Alloy.Globals.SlidingMenu.toggleLeftDrawer();
+		}
+	}).getView();
 	
   	$.nav.init({
   		title: 'App Settings',

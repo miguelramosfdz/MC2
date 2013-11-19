@@ -1,0 +1,8 @@
+/*
+ 10, 14, 
+ 20,
+ 30
+ * */
+
+".range-slider": { width: 200, height: 30 }
+	".range-slider-thumb": { width: 30, height: 30 }

@@ -49,7 +49,7 @@ exports.loadFeeds = function(excludedUserIDS, success, error) {
 	Cloud.Users.query({
 	    // page: 		1,
 	    // per_page: 	20,
-	    sel: 		{ "all": ["id", "liked", "photo", "urls"] }, // Selects the object fields to display
+	    sel: 		{ "all": ["id", "_gender", "liked", "photo", "urls"] }, // Selects the object fields to display
 	    where: 		filter
 	}, function (e) {
 	    if (e.success) {

@@ -31,3 +31,7 @@
 		".browser-next":   { backgroundImage: '/images/browser/next.png', left: Alloy.CFG.size_100 }
 		".browser-reload": { backgroundImage: '/images/browser/reload.png', right: Alloy.CFG.size_100 }
 		".browser-action": { backgroundImage: '/images/browser/action.png', right: Alloy.CFG.size_20 }	
+		
+/* slider */
+".range-slider": { width: Alloy.CFG.size_224, height: Alloy.CFG.size_17, backgroundImage: '/images/slider/base.png' }
+	".range-slider-thumb": { width: Alloy.CFG.size_16, height: Alloy.CFG.size_17, backgroundImage: '/images/slider/handle.png' }

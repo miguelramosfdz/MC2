@@ -5,22 +5,22 @@ var Cloud = require('ti.cloud'),
 
 Cloud.debug = true;
 
-init();
+exports.init = function() {
+	getCurrentCity();
+};
 
 exports.unload = function() {
 	if (vars) {
 		var movie = vars.loadingMovie;
-		movie.removeEventListener('complete', playMovie);
-		movie.hide();
-		movie.stop();
-		movie.release();
+		if (movie) {
+			movie.removeEventListener('complete', playMovie);
+			movie.hide();
+			movie.stop();
+			movie.release();
+		}
 		vars = null;
 	}
 };
-
-function init() {
-	getCurrentCity();
-}
 
 function analyze(e) {
 	var fbButton = e.source;
@@ -192,11 +192,13 @@ function getCurrentCity() {
 		            message:	'Sorry. We can\'t detect your current City.',
 		     	});
 			}
+			Alloy.Globals.toggleAI(false);
 	    });
 	} else {
 		Alloy.Globals.Common.showDialog({
             title:		'Warning',
             message:	'Location service on your device is turned off. Can\'t detect your current City.',
      	});
+     	Alloy.Globals.toggleAI(false);
 	}
 }

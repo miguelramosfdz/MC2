@@ -2,7 +2,7 @@
 	<Window class="win">
 		<View class="page">
 		
-			<ScrollableView class="scroller" onScrollend="onScrollend">
+			<ScrollableView class="scroller" onScrollend="onScrollend" onScroll="onScroll">
 				<!-- view 1 -->
 				<View>
 					<View class="wrapper">
@@ -59,17 +59,10 @@
 						</View>
 						<View class="row">
 							<Label class="h3 label">Age range:</Label>
-							<Label class="h3 value" onClick="showAgePicker" id="ageFrom">20</Label>
+							<Label class="h3 value" id="ageFrom">20</Label>
 							<Label class="h3 value age-value"> - </Label>
-							<Label class="h3 value age-value" onClick="showAgePicker" id="ageTo">25</Label>
+							<Label class="h3 value age-value" id="ageTo">25</Label>
 						</View>
-						
-						<!--
-						http://developer.appcelerator.com/question/154984/range-seekbar
-						https://github.com/Larpon/RangeSeekBar
-						https://code.google.com/p/range-seek-bar/	
-						-->
-						<Slider id="ageSlider" class="slider" onChange="setAge"/>
 					</View>
 				</View>
 			</ScrollableView>
@@ -77,6 +70,10 @@
 			<View id="lblContinue" onClick="updateAccount">
 				<Label class="h3-bold label-continue">To Be Continued...</Label>
 				<Label class="h3-bold label-continue-2">V</Label>
+			</View>
+			
+			<View id="sliderContainer">
+				<Require id="ageSlider" src="elements/slider"/>
 			</View>
 		
 		</View>
