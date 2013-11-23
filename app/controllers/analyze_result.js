@@ -2,6 +2,9 @@ var vars = {},
 	currentUser = arguments[0] || {};
 	
 exports.init = function() {
+	$.preferenceWho.init(toggleSex, Alloy.CFG.size_100);
+	$.preferenceWhen.init(showTimePicker, Alloy.CFG.size_100);
+	
 	loadUserInfo();
 	
 	var	pictureUrl = 'https://graph.facebook.com/' + currentUser.fbID + '/picture?width=320&height=320';
@@ -15,33 +18,41 @@ exports.init = function() {
 };
 
 function loadUserInfo() {
+	var like_age_from = 16, 
+		like_age_to = 50;
+		
 	if ( currentUser.custom_fields ) {
-		var custom_fields = currentUser.custom_fields,
-		    like_age_from = Math.floor( custom_fields['age']/ 2 ) + 7;
-            like_age_to   = custom_fields['age'] + 10;
+		var custom_fields = currentUser.custom_fields;
+	    like_age_from = Math.floor( custom_fields['age']/ 2 ) + 7;
+        like_age_to   = custom_fields['age'] + 10;
         
-        $.ageSlider.setProperties({
-        	min: like_age_from,
-        	max: like_age_to,
-        	values: [like_age_from, like_age_to],
-        	onChange: updateAgeRange
-        });
-        
-        $.ageFrom.text  = like_age_from;
-        $.ageTo.text    = like_age_to;
-        
-		$.lbName.text	= custom_fields['name'];
-		$.lbAge.text	= custom_fields['age'];
-		$.lbGender.text	= custom_fields['_gender'];
+		$.lblName.text	= custom_fields['name'];
+		$.lblAge.text	= custom_fields['age'];
+		$.lblGender.text	= custom_fields['_gender'];
 	}
+	
+	$.preferenceWho.set({
+		like_age_from : like_age_from,
+		like_age_to : like_age_to,
+		like_gender : 'Anyone'
+	});
+	
+	$.ageSlider.setProperties({
+    	min: like_age_from,
+    	max: like_age_to,
+    	values: [like_age_from, like_age_to],
+    	onChange: updateAgeRange
+    });
 }
 
 function updateAgeRange(type, value) {
+	var data = {};
 	if (type == 1) {
-		$.ageFrom.text = value;
+		data.like_age_from = value;
 	} else {
-		$.ageTo.text = value;
+		data.like_age_to = value;
 	}
+	$.preferenceWho.set(data);
 }
 
 function onScroll(e) {
@@ -61,40 +72,25 @@ function onScrollend(e) {
 	}
 }
 
-// PREFIX TOGGLE
-
-function togglePrefix(e) {
-  	var element = e.source.children[0];
-  	element.text = ((element.text == 'After:') ? 'Before:' : 'After:'); 
-}
-
 // TIME PICKER
+
 function showTimePicker(e) {
-	vars.target = e.source;
 	$.timePicker.show(setTime);
 }
 
 function setTime(time) {
-	var moment = require('alloy/moment'),
-		
-	arrTime = time.toTimeString().split(':');
-	vars.target.text = moment(time).format('h:mA');
-	vars.target.value = arrTime[0]+ arrTime[1];
-  	
+	$.preferenceWhen.update(time);
   	$.timePicker.hide();
 }
 
 // SEX TOGGLE
 
-function toggleSex(e) {
-	var element = e.source.children[0];
-	vars.target = element;
-  	
+function toggleSex(sex) {
   	var data = [{ title: 'Male' }, { title: 'Female' }, { title: 'Anyone' }],
 	  	values = [];
   	
   	for(var i=0,ii=data.length; i<ii; i++){
-		if (element.text == data[i].title) {
+		if (sex == data[i].title) {
 			values[0] = i;
 			break;
 		}
@@ -108,7 +104,9 @@ function toggleSex(e) {
 }
 
 function updateSex(values) {
-  	vars.target.text = values[0].title;
+  	$.preferenceWho.set({
+  		like_gender: values[0].title
+  	});
   	$.valuePicker.hide();
 }
 
@@ -119,13 +117,15 @@ function updateAccount ( e ) {
 	
 	Cloud.debug = true;
 
-	custom_fields['like_gender'] 	= Alloy.Globals.Common.capitalize($.lbTargetGender.text);
-	custom_fields['like_age_from'] 	= parseInt($.ageFrom.text, 10);
-	custom_fields['like_age_to'] 	= parseInt($.ageTo.text, 10);
+	var who = $.preferenceWho.get();
+	custom_fields['like_gender'] 	= Alloy.Globals.Common.capitalize( who.like_gender );
+	custom_fields['like_age_from'] 	= who.like_age_from;
+	custom_fields['like_age_to'] 	= who.like_age_to;
 	
 	//busy time is formatted as: 1HHmm or 2HHmm => 1: before, 2: after, HH: 2 digits of hour, mm: 2 digits of minute, e.g : 12030 => before 20:30 (PM) , 22030 => after 20:30 (PM)
-	custom_fields['busy_weekdays'] 	= ( $.lbBusyValue.value ) ? Alloy.Globals.Common.formatBusyTime( $.lbBusyText.text.replace(':',''), $.lbBusyValue.value ): 10659;// 10659 default value format: 1 => Before, 0659 => 06:59AM
-	custom_fields['busy_weekends'] 	= ( $.lbWeekendsValue.value ) ? Alloy.Globals.Common.formatBusyTime( $.lbWeekendsText.text.replace(':',''), $.lbWeekendsValue.value ): 22259; //22259 default value format: 2 => Before, 2259 => 22:59PM
+	var when = $.preferenceWhen.get();
+	custom_fields['busy_weekdays'] 	= ( when.busy_weekdays ) ? Alloy.Globals.Common.formatBusyTime( when.busy_weekdays_text, when.busy_weekdays ): 10659;// 10659 default value format: 1 => Before, 0659 => 06:59AM
+	custom_fields['busy_weekends'] 	= ( when.busy_weekends ) ? Alloy.Globals.Common.formatBusyTime( when.busy_weekends_text, when.busy_weekends ): 22259; //22259 default value format: 2 => Before, 2259 => 22:59PM
 	
 	Cloud.Users.update( currentUser, function (e) {
 	    if (e.success) {

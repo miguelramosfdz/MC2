@@ -14,7 +14,7 @@
 		
 		<View class="border"/>
 		
-		<View class="item">
+		<View class="item" url="match_preference">
 			<ImageView class="icon" image="/images/menu/match_preference.png"/>
 			<Label class="title">Match preference</Label>
 		</View>

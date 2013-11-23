@@ -152,20 +152,22 @@ function listSwipe(e) {
   		
   		//
   		
-  		$['card_' + next].top = vars.height;
-  		
   		var currentCard = $['card_' + current];
+  		currentCard.zIndex = 2;
   		
   		// mark view for current user
   		Api.onViewPhoto( currentCard.userId );
   		
-  		currentCard.zIndex = 2;
-  		currentCard.animate({ top: 0, duration: 300 }, function(e){ 
+  		$['card_' + prev].animate({ top: -vars.height, duration: 500 });
+  		
+  		currentCard.animate({ top: 0, duration: 500 }, function(e){ 
+  			$['card_' + vars.containerIndex].zIndex = 1;
+  		});
+  		
+  		$['card_' + next].animate({ top: vars.height, duration: 500 }, function(e) {
   			var currentIndex = vars.containerIndex,
   				previousIndex = (currentIndex == 0 ? 2 : currentIndex == 1 ? 0 : 1);
   				
-  			$['card_' + currentIndex].zIndex = 1;
-  			
   			var element = $['card_' + previousIndex];
   			element.top = 2 * vars.height;
   			element.removeAllChildren();

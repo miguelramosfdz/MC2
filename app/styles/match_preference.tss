@@ -1,0 +1,5 @@
+".scroller": { bottom: Alloy.CFG.size_50, showPagingControl: true }
+
+"#sliderContainer": { width: Ti.UI.SIZE, height: Ti.UI.SIZE, top: Alloy.CFG.size_260 }
+
+

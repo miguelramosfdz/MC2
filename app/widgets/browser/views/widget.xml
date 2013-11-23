@@ -1,0 +1,23 @@
+<Alloy>
+	<View class="browser-container">
+		<ImageView class="browser-background"/>
+		
+		<WebView id="browser" class="browser-viewport" onBeforeload="browserBeforeLoad" onLoad="browserOnLoad" onError="browserError"/>
+		
+		<View class="browser-toolbar">
+			<Button id="btnBack" class="browser-button browser-back" onClick="goBack"/>
+			<Button id="btnNext" class="browser-button browser-next" onClick="goForward"/>
+			<Button id="btnAction" class="browser-button browser-action" onClick="showActionDialog"/>
+			<Button class="browser-button browser-reload" onClick="reloadPage"/>
+		</View>
+		
+		<OptionDialog id="actionDialog" title="Select Action" onClick="actionDialogClicked">
+            <Options>
+                <Option>Copy link</Option>
+                <Option>Open in the browser</Option>
+                <Option>Send by email</Option>
+                <Option>Cancel</Option>
+            </Options>
+        </OptionDialog>
+	</View>
+</Alloy>

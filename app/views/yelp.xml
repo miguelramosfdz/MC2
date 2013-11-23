@@ -1,0 +1,8 @@
+<Alloy>
+	<View class="page">
+		<Widget id="nav" src="navigation_group"/>
+		<View class="body">
+			<Widget id="browser" src="browser"/>
+		</View>
+	</View>
+</Alloy>

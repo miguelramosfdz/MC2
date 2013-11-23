@@ -5,32 +5,9 @@
 		".row": { width: Ti.UI.SIZE, height: Ti.UI.SIZE, layout: 'horizontal' }
 			".label": { color: '#ccc' }
 			".value": { left: Alloy.CFG.size_5/*, shadowColor: '#fff', shadowOffset: { x: 1, y: 1 }*/ }
-		".intro": { bottom: Alloy.CFG.size_10, left: Alloy.CFG.size_10, right: Alloy.CFG.size_10, color: '#999' }
-		
-		/* view 1 */	
-		
-		/* view 2 */
-		".label-time": { left: 0, color: '#999' }
-		".row-time": { left: 0}
-			".toggle": { width: Ti.UI.SIZE, height: Ti.UI.SIZE, top: 0, left: 0, layout: 'vertical' }
-				".toggle-label": { touchEnabled: false }
-				".toggle-arrow": { width: Alloy.CFG.size_12, height: Alloy.CFG.size_10, top: Alloy.CFG.size__7, image: '/images/analyzing/triangle.png', touchEnabled: false }
-				".toggle-arrow[platform=android]": { top: Alloy.CFG.size__5 }
-			".toggle-h": { layout: 'horizontal' }	
-				".toggle-label-h": { touchEnabled: false }
-				".toggle-arrow-h": { width: Alloy.CFG.size_10, height: Alloy.CFG.size_17, left: Alloy.CFG.size_3, image: '/images/analyzing/triangle2.png', touchEnabled: false }
-				".toggle-arrow-h[platform=ios]": { top: Alloy.CFG.size_2 }
-			".toggle-value": { top: 0 }	
-				
-		/* view 3 */
-		".age-value": { left: 0 }
 		
 "#lblContinue": { opacity: 0, height: Ti.UI.SIZE, bottom: Alloy.CFG.size_10, layout: 'vertical' }
 	".label-continue": { color: '#999' }
 	".label-continue-2": { top: Alloy.CFG.size__3, color: '#999' }
 
 "#sliderContainer": { opacity: 0, width: Ti.UI.SIZE, height: Ti.UI.SIZE, top: Alloy.CFG.size_260 }
-		
-".city-picker": { top: 0, visible: false, backgroundColor: '#fff' }
-
-

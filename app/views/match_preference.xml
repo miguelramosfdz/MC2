@@ -1,0 +1,28 @@
+<Alloy>
+	<View class="page">
+		<Widget id="nav" src="navigation_group"/>
+		<View class="body">
+			
+			<ScrollableView class="scroller" onScrollend="onScrollend" onScroll="onScroll">
+				<Require id="preferenceWho" src="elements/match_preference/who"/>
+				<Require id="preferenceWhen" src="elements/match_preference/when"/>
+			</ScrollableView>
+		
+			<View id="sliderContainer">
+				<Require id="ageSlider" src="elements/slider"/>
+			</View>
+		
+			<!-- value picker -->
+			<Require id="valuePicker" src="elements/value_picker"/>
+		
+			<!-- time picker -->
+			<Require id="timePicker" src="elements/time_picker"/>
+		
+		</View>
+	</View>
+</Alloy>
+
+
+		
+			
+		

@@ -1,0 +1,27 @@
+<Alloy>
+	<View>
+		<View id="wrapper" class="wrapper">
+			<Label class="h2 center">When are you typically busy?</Label>
+			
+			<Label class="h2 label margin label-time">Weekdays</Label>
+			<View class="row row-time">
+				<View class="toggle" onClick="togglePrefix">
+					<Label id='lbBusyText' class="h2 toggle-label">Before:</Label>
+					<ImageView class="toggle-arrow"/>
+				</View>
+				<Label id='lbBusyValue' class="h2-bold value toggle-value" onClick="showTimePicker">6:59AM</Label>
+			</View>
+			
+			<Label class="h2 label margin label-time">Weekends</Label>
+			<View class="row row-time">
+				<View class="toggle" onClick="togglePrefix">
+					<Label id='lbWeekendsText' class="h2 toggle-label">After:</Label>
+					<ImageView class="toggle-arrow"/>
+				</View>
+				<Label id='lbWeekendsValue' class="h2-bold value toggle-value" onClick="showTimePicker">10:59PM</Label>
+			</View>
+		</View>
+		
+		<Label class="h3 intro">..................................................................................... \n *MeetCute will not send notifications when you are typically busy, nor any later than 10:59PM and no earlier than 6:59AM local time.</Label>
+	</View>
+</Alloy>

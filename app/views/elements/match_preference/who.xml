@@ -1,0 +1,20 @@
+<Alloy>
+	<View>
+		<View id="wrapper" class="wrapper">
+			<Label class="h2 center">Who would you like to \ncross paths with?</Label>
+			<View class="row margin">
+				<Label class="h2 label">Sex:</Label>
+				<View class="toggle" onClick="toggleSex">
+					<Label id='lbTargetGender' class="h2-bold value toggle-label">Anyone</Label>
+					<ImageView class="toggle-arrow"/>
+				</View>
+			</View>
+			<View class="row">
+				<Label class="h3 label">Age range:</Label>
+				<Label class="h3 value" id="ageFrom">20</Label>
+				<Label class="h3 value age-value"> - </Label>
+				<Label class="h3 value age-value" id="ageTo">25</Label>
+			</View>
+		</View>
+	</View>
+</Alloy>

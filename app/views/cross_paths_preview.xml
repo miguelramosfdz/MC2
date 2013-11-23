@@ -1,0 +1,31 @@
+<Alloy>
+	<View class="page">
+		<Widget id="nav" src="navigation_group"/>
+		<View class="body">
+			
+			<View class="wrapper">
+				<Label class="title">Cross paths with a\n match for you at</Label>
+			
+				<Label id="lblName" class="place">Cafe Claire</Label>
+				<Label id="lblAddress" class="address">(1245 Main Street)</Label>
+				<Label id="lblTime" class="time">11:25AM</Label>
+				
+				<Label class="countdown">Paths will cross in:\n</Label>
+				<Label id="lblCountdown" class="countdown">12 mins 59 secs</Label>
+				
+				<View id="btnBack" class="button button-back" onClick="goBack">
+					<Label class="button-label">Pick another place</Label>
+					<ImageView class="button-icon icon-back"/>
+				</View>
+				
+				<View id="btnWingman" class="button button-wingman" onClick="showWingmanMessage">
+					<Label class="button-label">Wingman</Label>
+					<ImageView class="button-icon icon-wingman"/>
+				</View>
+			</View>
+			
+			<Label id="lblNotification" class="intro">*notifications will be sent in 1 min</Label>
+			
+		</View>
+	</View>
+</Alloy>

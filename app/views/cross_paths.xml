@@ -1,0 +1,40 @@
+<Alloy>
+	<View class="page">
+		<Widget id="nav" src="navigation_group"/>
+		<View class="body">
+			
+			<View class="wrapper">
+				<Label class="intro">* Pick a place * Go \n& MeetCute will let your matches know where they can cross paths with you.</Label>
+			
+				<View class="row first-row">
+					<Label class="label">Place:</Label>
+					<Label id="lblPlace" class="value" onClick="showPlaceSearch">_____________</Label>
+				</View>
+				
+				<View class="row">
+					<Label class="label">Time:</Label>
+					<Label id="lblTime" class="value" onClick="showTimePicker">1:25AM</Label>
+				</View>
+				
+				<View class="button button-view-map" onClick="showMap">
+					<ImageView class="button-icon icon-map"/>
+					<Label class="button-label map-link">view map</Label>
+				</View>
+			</View>
+			
+			<View class="button button-surprise-me" onClick="surpriseMe">
+				<ImageView class="button-icon icon-update"/>
+				<Label class="button-label">surprise me</Label>
+			</View>
+			
+			<View id="btnIWillBeThere" class="button button-ok" onClick="loadPreview">
+				<ImageView class="button-icon icon-ok"/>
+				<Label class="button-label">i'll be there</Label>
+			</View>
+			
+			<!-- time picker -->
+			<Require id="timePicker" src="elements/time_picker"/>
+			
+		</View>
+	</View>
+</Alloy>

@@ -1,0 +1,20 @@
+".wrapper": { layout: 'vertical' }
+	
+	".intro": { top: Alloy.CFG.size_20, left: Alloy.CFG.size_25, right: Alloy.CFG.size_25, font: { fontSize: Alloy.CFG.size_13 }, color: '#fff', textAlign: 'center' }
+	".row": { width: Ti.UI.SIZE, height: Ti.UI.SIZE, layout: 'horizontal' }
+	".first-row": { top: Alloy.CFG.size_50 }
+		".label": { font: { fontSize: Alloy.CFG.size_16 }, color: '#fff' }
+		".value": { left: Alloy.CFG.size_10, font: { fontSize: Alloy.CFG.size_18, fontWeight: 'bold' }, color: '#fff' }
+	
+	".button": { width: Ti.UI.SIZE, height: Ti.UI.SIZE, layout: 'vertical' }
+		".button-icon": { touchEnabled: false }
+		".button-label": { font: { fontSize: Alloy.CFG.size_12 }, color: '#fff', touchEnabled: false }
+		
+	".button-view-map": { top: Alloy.CFG.size_40 }
+		".icon-map": { width: Alloy.CFG.size_20, height: Alloy.CFG.size_20, image: '/images/cross_paths/btn-view-map.png' }	
+		
+	".button-surprise-me": { bottom: Alloy.CFG.size_20, left: Alloy.CFG.size_20 }
+		".icon-update": { width: Alloy.CFG.size_70, height: Alloy.CFG.size_70, image: '/images/cross_paths/btn-surprise-me.png' }
+
+	".button-ok": { visible: false, bottom: Alloy.CFG.size_20, right: Alloy.CFG.size_20 }
+		".icon-ok": { width: Alloy.CFG.size_70, height: Alloy.CFG.size_70, image: '/images/cross_paths/btn-map.png' }
