@@ -47,6 +47,10 @@
                     <string>fonts/AGaramondPro-Regular.otf</string>
                     <string>fonts/AGaramondPro-Bold.otf</string>
                 </array>
+                <key>UIBackgroundModes</key>
+                <array>
+                    <string>location</string>
+                </array>
             </dict>
         </plist>
     </ios>
@@ -62,6 +66,7 @@
         <module platform="commonjs">ti.cloud</module>
         <module platform="android">facebook</module>
         <module platform="iphone">facebook</module>
+        <module platform="android">ti.cloudpush</module>
     </modules>
     <deployment-targets>
         <target device="android">true</target>
