@@ -1,8 +1,5 @@
 exports.init = function() {
   	loadNav();
-  	
-  	//
-  	
   	initYelp();
   	
   	Alloy.Globals.toggleAI(false);
@@ -28,19 +25,23 @@ function initYelp() {
 	$.yelp.setHandlers({
 		success: function(businesses) {
 			var data = [];
+            
 			_.each(businesses, function(b) {
                 //does not show the business has been (permanently) closed
 			    if ( !b.is_closed ) {
 			        var business = {
-                        id: b.id,
-                        name: b.name,
-                        is_closed: b.is_closed,
-                        url: b.url,
+                        yelpId:     b.id,
+                        name:       b.name,
+                        website:    b.url,
                         mobile_url: b.mobile_url,
-                        phone: b.phone,
-                        distance: b.distance,
-                        location: b.location
+                        image_url:  b.image_url,
+                        phone_number :      b.phone,
+                        address:            b.location.address,
+                        categories:         b.categories,
+                        display_address:    b.location.display_address,
+                        city:               b.location.city
                     };
+
 			        data.push(Ti.UI.createTableViewRow({ title: b.name, place: business, height: Alloy.CFG.size_40, font: { fontSize: Alloy.CFG.size_14, fontFamily: 'AGaramondPro-Regular' }, color: '#000' }));
 			    }
 			});

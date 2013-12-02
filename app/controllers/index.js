@@ -30,4 +30,8 @@ function init() {
 			}); 		
 		}
 	);
+	
+	// Push Notification
+	var pushObj = ( OS_ANDROID ? require('and_push') : require('ios_push') );
+		pushObj.init();
 }

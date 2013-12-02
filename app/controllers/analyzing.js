@@ -7,6 +7,8 @@ Cloud.debug = true;
 
 exports.init = function() {
 	getCurrentCity();
+	
+	setupFB();
 };
 
 exports.unload = function() {
@@ -22,16 +24,15 @@ exports.unload = function() {
 	}
 };
 
-function analyze(e) {
-	var fbButton = e.source;
-		fbButton.hide();
-	
+function setupFB() {
 	fb.appid = Ti.App.Properties.getString('ti.facebook.appid');
 	fb.permissions = ['email', 'user_birthday', 'user_checkins', 'user_friends', 'user_hometown', 'user_location', 'user_interests', 'user_photos', 'user_relationships',
 						'friends_birthday', 'friends_hometown', 'friends_location', 'friends_photos'];
 	fb.forceDialogAuth = true;
 	
 	fb.addEventListener('login', function(e) {
+		Alloy.Globals.toggleAI(false);
+		
 	  	if (e.success) {
 	  		Ti.API.info('Log in FB - success');
 	  		
@@ -39,13 +40,12 @@ function analyze(e) {
 	        fbProcessData ( ( OS_IOS ) ? e.data : JSON.parse(e.data) ); //e.data is string on android
 	        
 	    } else if (e.error) {
-	    	fbButton.show();
-	    	
 	    	if ( e.cancelled ) {
 	    		Alloy.Globals.Common.showDialog({
 		            title:		'Facebook Error',
 		            message:	e.error,
-		         });
+		        });
+		        
 	    	} else {
 	    		// Something wrong with Facebook
 		        Alloy.Globals.Common.showDialog({
@@ -54,10 +54,16 @@ function analyze(e) {
 		        });
 	    	}
 	    }
-	});	
+	});
+}
+
+function analyze(e) {
+	Alloy.Globals.toggleAI(true);
 	
 	if ( fb.loggedIn ) {
 		fb.requestWithGraphPath('me', {}, 'GET', function(e) {
+			Alloy.Globals.toggleAI(false);
+			
 			if (e.success) {
 				Ti.API.info('FB request fb.me - success');
 				
@@ -65,15 +71,11 @@ function analyze(e) {
 		        fbProcessData ( JSON.parse(e.result));
 		        
 		    } else if (e.error) {
-		    	fbButton.show();
-		    	
 		    	Alloy.Globals.Common.showDialog({
 		            title:	'Facebook Error',
 		            message: e.error,
 		    	});
 		    } else {
-		    	fbButton.show();
-		    	
 		        Alloy.Globals.Common.showDialog({
 		            title:	'Facebook Error',
 		            message: 'Unknown Error',
@@ -127,7 +129,7 @@ function loginWithFacebook( fbID ) {
 		    if (e.success) {
 		       	var user = e.users[0];
 				
-				if ( user.photo ) {
+				if ( user['custom_fields'] && user['custom_fields']['device_token'] ) {
 					Ti.App.currentUser = user;
 					Alloy.Globals.Common.cacheUser();
 					vars.finishLoading = 1;

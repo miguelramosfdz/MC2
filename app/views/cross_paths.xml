@@ -27,7 +27,7 @@
 				<Label class="button-label">surprise me</Label>
 			</View>
 			
-			<View id="btnIWillBeThere" class="button button-ok" onClick="loadPreview">
+			<View id="btnIWillBeThere" class="button button-ok" onClick="clickOnIWillBeThere">
 				<ImageView class="button-icon icon-ok"/>
 				<Label class="button-label">i'll be there</Label>
 			</View>

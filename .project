@@ -3,6 +3,7 @@
 	<name>meetcute2</name>
 	<comment></comment>
 	<projects>
+		<project>meetcute.api</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

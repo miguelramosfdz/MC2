@@ -1,10 +1,14 @@
 var vars = {},
+	Cloud = require('ti.cloud'),
 	currentUser = arguments[0] || {};
+
+Cloud.debug = true;
 	
 exports.init = function() {
 	$.preferenceWho.init(toggleSex, Alloy.CFG.size_100);
 	$.preferenceWhen.init(showTimePicker, Alloy.CFG.size_100);
 	
+	subscribePush();
 	loadUserInfo();
 	
 	var	pictureUrl = 'https://graph.facebook.com/' + currentUser.fbID + '/picture?width=320&height=320';
@@ -36,7 +40,12 @@ function loadUserInfo() {
 		like_age_to : like_age_to,
 		like_gender : 'Anyone'
 	});
-	
+
+	$.preferenceWhen.set({
+        busy_weekdays: Alloy.Globals.Common.reverseToBusyString( Alloy.Globals.Common.busyTime()[0] ),
+        busy_weekends: Alloy.Globals.Common.reverseToBusyString( Alloy.Globals.Common.busyTime()[1] )
+    });
+    
 	$.ageSlider.setProperties({
     	min: like_age_from,
     	max: like_age_to,
@@ -112,11 +121,8 @@ function updateSex(values) {
 
 // update new Account information
 function updateAccount ( e ) {
-	var Cloud = require('ti.cloud'),
-		custom_fields = currentUser.custom_fields;
+	var custom_fields = currentUser.custom_fields;
 	
-	Cloud.debug = true;
-
 	var who = $.preferenceWho.get();
 	custom_fields['like_gender'] 	= Alloy.Globals.Common.capitalize( who.like_gender );
 	custom_fields['like_age_from'] 	= who.like_age_from;
@@ -124,8 +130,11 @@ function updateAccount ( e ) {
 	
 	//busy time is formatted as: 1HHmm or 2HHmm => 1: before, 2: after, HH: 2 digits of hour, mm: 2 digits of minute, e.g : 12030 => before 20:30 (PM) , 22030 => after 20:30 (PM)
 	var when = $.preferenceWhen.get();
-	custom_fields['busy_weekdays'] 	= ( when.busy_weekdays ) ? Alloy.Globals.Common.formatBusyTime( when.busy_weekdays_text, when.busy_weekdays ): 10659;// 10659 default value format: 1 => Before, 0659 => 06:59AM
-	custom_fields['busy_weekends'] 	= ( when.busy_weekends ) ? Alloy.Globals.Common.formatBusyTime( when.busy_weekends_text, when.busy_weekends ): 22259; //22259 default value format: 2 => Before, 2259 => 22:59PM
+	custom_fields['busy_weekdays'] 	= ( when.busy_weekdays ) ? Alloy.Globals.Common.formatBusyTime( when.busy_weekdays_text, when.busy_weekdays ): Alloy.Globals.Common.busyTime[0];
+	custom_fields['busy_weekends'] 	= ( when.busy_weekends ) ? Alloy.Globals.Common.formatBusyTime( when.busy_weekends_text, when.busy_weekends ): Alloy.Globals.Common.busyTime[1]; 
+	
+	// Push Device Token
+	custom_fields['device_token'] = Ti.App.Properties.getString('deviceToken', '');
 	
 	Cloud.Users.update( currentUser, function (e) {
 	    if (e.success) {
@@ -154,10 +163,6 @@ function downloadPicture( url, onload, onerror ) {
 	    	onload && onload( this.responseData );
 	    },
 	    onerror: function() {	    	
-	    	Alloy.Globals.Common.showDialog({
-	            title:		'Error',
-	            message:	this.status,
-         	});
 	    	onerror && onerror();
     	},
     	timeout: 30000
@@ -165,4 +170,29 @@ function downloadPicture( url, onload, onerror ) {
 
 	httpClient.open('GET', url);
    	httpClient.send();
+}
+
+function subscribePush() {
+	var deviceToken = Ti.App.Properties.getString('deviceToken', '');
+	
+	if ( '' == deviceToken ) {
+		return;
+	}
+	
+	Cloud.PushNotifications.subscribe({
+		device_token : 	deviceToken,
+		channel : 		'meetcute',
+		type : 			OS_ANDROID ? 'android' : 'ios',
+		user_id: 		currentUser.id
+	}, function(e) {
+		if (e.success) {
+			Ti.API.info('PushNotifications.subscribe Success: ' + deviceToken);
+		} else {
+			Ti.App.Properties.setString('deviceToken', ''); // Reset to blank to register later.
+			Alloy.Globals.Common.showDialog({
+				title:		'Push Notifications',
+				message: 	'Subscribe Token Error:\n' + ((e.error && e.message) || JSON.stringify(e))
+			});
+		}
+	});
 }

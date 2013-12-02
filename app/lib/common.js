@@ -86,3 +86,35 @@ exports.capitalize = function (s) {
 	
     return s.charAt(0).toUpperCase() + s.slice(1);
 };
+
+/*
+ @return default value of busy time  ([before 06:69, after: 22:59])
+ * 10659 default value format: 1 => Before, 0659 => 06:59AM
+ * 22259 default value format: 2 => Before, 2259 => 22:59PM
+ * */
+exports.busyTime = function() {
+    return [ 10659, 22259 ];
+};
+
+exports.reverseToBusyString = function  ( time ) {
+    var result = {},
+        moment = require('alloy/moment');
+    
+    time = time.toString();
+    if ( time && time.length == 5 ) {
+        var temp        = time.slice(1),
+            realTime    = [ temp.slice(0, 2), temp.slice(2) ],
+            _date       = moment();
+    
+        _date.hour( parseInt ( realTime[0], 10 ) );
+        _date.minute( parseInt ( realTime[1], 10 ) ); 
+    
+        result = {
+            prefix: ( time.charAt(0) == 2 ) ? 'After' : 'Before',
+            time:   _date.format('h:mmA'),
+            value:  realTime.join('')
+        };
+    }
+    
+    return result;
+};

@@ -120,7 +120,7 @@ function loadCard(dataIndex, containerIndex) {
 	var card = Ti.UI.createView();
 		card.add( Ti.UI.createImageView({ image: user.photo.urls[vars.photoPath], width: Alloy.CFG.size_280, height: Alloy.CFG.size_280, top: 0 }) );
 		card.add( Ti.UI.createImageView({ image: '/images/someone_like/gradient.png', width: Alloy.CFG.size_280, height: Alloy.CFG.size_280, top: 0 }) );
-		card.add( Ti.UI.createButton({ userId: user.id, gender: user.custom_fields._gender, liked: user.custom_fields.liked, opacity: 0.5, backgroundImage: '/images/someone_like/love.png', width: Alloy.CFG.size_70, height: Alloy.CFG.size_63, top: Alloy.CFG.size_255 }) );
+		card.add( Ti.UI.createButton({ eleType: 'button-like', userId: user.id, gender: user.custom_fields._gender, liked: user.custom_fields.liked, opacity: 0.5, backgroundImage: '/images/someone_like/love.png', width: Alloy.CFG.size_70, height: Alloy.CFG.size_63, top: Alloy.CFG.size_255 }) );
 	
 	var container = $['card_' + containerIndex];
 	container.userId = user.id;
@@ -189,7 +189,7 @@ function listSwipe(e) {
 function like(e) {
 	var photo = e.source;
 		
-  	if ( photo.userId != null ) {
+  	if ( photo.userId != null && photo.eleType == 'button-like' ) {
   		photo.animate({ opacity: 1, duration: 300 });
   		
   		if (photo.isLiked != true) {

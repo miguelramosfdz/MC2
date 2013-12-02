@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ti:app xmlns:ti="http://ti.appcelerator.org">
+    <property name="acs-service-baseurl-meetcute.api">https://d2999cab89c9ba883d5fce28a24b136661d8a9c4.cloudapp.appcelerator.com/</property>
     <property name="ti.facebook.appid">425427690836876</property>
     <property name="acs-oauth-secret-production" type="string">bHwSKi3hnQzrknJ2Cr0gjkoXm5R8qMmc</property>
     <property name="acs-oauth-key-production" type="string">rRgMnEPgnNslwsXGCr0Q0jSfYxJoHCTH</property>
@@ -42,10 +43,10 @@
                 <key>UIStatusBarStyle</key>
                 <string>UIStatusBarStyleLightContent</string>
                 <key>UIAppFonts</key>
-	            <array>
-	                <string>fonts/AGaramondPro-Regular.otf</string>
-	                <string>fonts/AGaramondPro-Bold.otf</string>
-	            </array>
+                <array>
+                    <string>fonts/AGaramondPro-Regular.otf</string>
+                    <string>fonts/AGaramondPro-Bold.otf</string>
+                </array>
             </dict>
         </plist>
     </ios>

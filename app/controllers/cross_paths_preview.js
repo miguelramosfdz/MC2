@@ -1,20 +1,24 @@
 var vars = {
-	time: 60, // 60 seconds
-	timer: null
-};
-
-vars.args = arguments[0] || {};
+		time: 60, // 60 seconds
+		timer: null,
+		mode: arguments[0].mode || 'new'
+	},
+	crossPath = ( arguments[0] && arguments[0].crossPath ) || {},
+	Api = require('api');
 
 exports.init = function() {
   	loadNav();
-  	loadCrossPath();
-  	updateTime();
+  	loadCrossPath( vars.mode );
   	
   	Alloy.Globals.toggleAI(false);
 };
 
 exports.unload = function() {
 	clearTimeout(vars.timer);
+	
+	if ( vars.mode == 'new' ) {
+	   createCrossPath( true );
+	}
 };
 
 exports.androidback = function() {
@@ -58,6 +62,7 @@ function goBack(e) {
 	dialog.show();
 	dialog.addEventListener('click', function(e) {
 	  	if (e.index == 1) {
+	  	    crossPath = null; // null when cancel & back to cross back
 	  		Alloy.Globals.PageManager.loadPrevious();
 	  	}
 	});
@@ -71,16 +76,46 @@ function updateTime() {
         if ( time >= 0 ) {
             $.lblNotification.text = '*notifications will be sent in ' + time + ' second' + ( time > 1 ? 's' : '' );
         } else {
-            //TODO: send cross paths info to server here
-            /*
-             * param: @crossPath: vars.args
-             */
+            // Create Place & Event on the server
+            if ( crossPath.place && crossPath.event ) {
+                createCrossPath();
+            }
+
             clearInterval( vars.timer );
             vars.timer = null;
-            $.btnBack.parent.remove($.btnBack);
+            $.btnBack.parent.remove( $.btnBack );
+            $.lblNotification.parent.remove( $.lblNotification );
             $.btnWingman.show();
         }
     }, 1000 );
+}
+
+function createCrossPath ( noCallback ) {
+    if ( !crossPath ) {
+        return;
+    }
+    
+    if ( !noCallback ) {
+        Alloy.Globals.toggleAI(true);
+    }
+    // does not show alert response if the user leave this screen
+    Api.crossPath( 
+    	{ 
+    		place: JSON.stringify( crossPath.place ), 
+    		event: JSON.stringify( crossPath.event ) 
+    	},
+    	function ( res ) {
+    	    crossPath = null;
+	        Alloy.Globals.toggleAI(false);
+	        
+    	    if ( res.error && !noCallback ) {
+    	        Alloy.Globals.Common.showDialog({
+                    title:      'Error',
+                    message:    res.error,
+                });
+    	    }
+    	}
+    );
 }
 
 function showWingmanMessage(e) {
@@ -88,16 +123,28 @@ function showWingmanMessage(e) {
   	alert( messages[ new Date().getTime() % 3 ] );
 }
 
-function loadCrossPath() {
-    var data        = vars.args,
-        moment      = require('alloy/moment'),
-        _duration   = ( moment( data.time ).diff( moment() ) ),
+function loadCrossPath( mode ) {
+    if ( !crossPath.place && !crossPath.event ) {
+        return;
+    }
+    
+    var moment      = require('alloy/moment'),
+        _duration   = ( moment( crossPath.event['start_time'] ).diff( moment() ) ),
         _hours      = moment.duration(_duration).hours();
         _minutes    = moment.duration(_duration - ( _hours * 3600 ) ).minutes();
         _seconds    = moment.duration(_duration - ( ( _hours * 3600 ) +  ( _minutes * 60 ) ) ).seconds();
      
-    $.lblName.text    = data.place['name'];
-    $.lblAddress.text = '(' + data.place['location']['address'][0] + ')';
-    $.lblTime.text    = moment(data.time).format('h:mmA');
+    $.lblName.text    = crossPath.place['name'];
+    $.lblAddress.text = crossPath.place['address'][0] ? '(' + crossPath.place['address'][0] + ')' : '';
+    $.lblTime.text    = moment( crossPath.event['start_time'] ).format('h:mmA');
     $.lblCountdown.text = _hours + ' hrs ' + _minutes + ' mins ' + _seconds + ' secs ';
+    
+    if ( vars.mode == 'review' ) {
+        $.btnBack.visible = false;
+        $.lblNotification.visible = false;
+        return;    
+    } 
+
+    //start countdown
+    updateTime();
 }
