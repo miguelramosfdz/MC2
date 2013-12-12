@@ -36,11 +36,15 @@ function showTimePicker(e) {
 }
 
 exports.update = function(time) {
+	if ( !target ) {
+		return;
+	}
+	
 	var moment = require('alloy/moment'),
 		arrTime = time.toTimeString().split(':'),
 		value = arrTime[0] + arrTime[1];
-	
-  	target.text = moment(time).format('h:mmA');
-  	target.value = value;
-  	target = null;
+		
+    target.text = moment(time).format('h:mmA');
+    target.value = value;
+    target = null;
 };

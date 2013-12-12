@@ -15,7 +15,7 @@ function retrieveDeviceToken() {
 	// Initialize the module
 	CloudPush.retrieveDeviceToken({
 		success : deviceTokenSuccess,
-		error : deviceTokenError
+        error : deviceTokenError
 	});
 }
 
@@ -33,14 +33,40 @@ function deviceTokenError(e) {
 function registerCallbacks() {
 	// Process incoming push notifications
 	CloudPush.addEventListener('callback', function(evt) {
-		alert(evt.payload);
+		if ( evt && evt.payload ) {
+		    var data = JSON.parse ( evt.payload );
+		    
+		    switch( data.atras ) {
+		        case "reminder":
+	                  Alloy.Globals.Common.startTrackingLocation( data.eventId, data.latitude, data.longitude );
+		              break;
+		        case "cross_path":
+		             if (Alloy.Globals.loggedIn) {
+		        		Alloy.Globals.PageManager.load({
+							url:        'cross_paths_preview',
+			                isReset:    true,
+			                data:       { mode: 'review', crossPath: data.crossPath }
+						}); 
+		        	} else {
+			        	Ti.App.Properties.setObject('appRedirect', {
+							url:        'cross_paths_preview',
+			                isReset:    true,
+			                data:       { mode: 'review', crossPath: data.crossPath }
+						});
+					}
+		       		break;
+		        case "feedback":
+		             Alloy.Globals.Common.answerFeedback( data );
+                     break;
+		      }
+		  }
 	});
 	// Triggered when the push notifications is in the tray when the app is not running
-	CloudPush.addEventListener('trayClickLaunchedApp', function(evt) {
-		Ti.API.error('Tray Click Launched App (app was not running):' + '\n\t' + JSON.stringify(evt));
-	});
-	// Triggered when the push notifications is in the tray when the app is running
-	CloudPush.addEventListener('trayClickFocusedApp', function(evt) {
-		Ti.API.error('Tray Click Focused App (app was already running):' + '\n\t' + JSON.stringify(evt));
-	});
+	// CloudPush.addEventListener('trayClickLaunchedApp', function(evt) {
+		// Ti.API.error('Tray Click Launched App (app was not running):' + '\n\t' + JSON.stringify(evt));
+	// });
+	// // Triggered when the push notifications is in the tray when the app is running
+	// CloudPush.addEventListener('trayClickFocusedApp', function(evt) {
+		// Ti.API.error('Tray Click Focused App (app was already running):' + '\n\t' + JSON.stringify(evt));
+	// });
 }

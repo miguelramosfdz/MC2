@@ -24,8 +24,8 @@
 /* browser */
 ".browser-container": { width: '100%', height: '100%' }	
 	".browser-background": { width: Alloy.CFG.size_320, height: Alloy.CFG.size_480, backgroundColor: '#000' }
-	".browser-viewport": { bottom: Alloy.CFG.size_51, backgroundColor: 'transparent' }
-	".browser-toolbar": { height: Alloy.CFG.size_51, bottom: 0, backgroundImage: '/images/browser/bg.png' }	
+	".browser-viewport": { bottom: 0, backgroundColor: 'transparent' }
+	".browser-toolbar": { height: 0, bottom: 0, backgroundImage: '/images/browser/bg.png' }	
 		".browser-button": { width: Alloy.CFG.size_39, height: Alloy.CFG.size_39, top: Alloy.CFG.size_6 }
 		".browser-back":   { backgroundImage: '/images/browser/back.png', left: Alloy.CFG.size_20 }
 		".browser-next":   { backgroundImage: '/images/browser/next.png', left: Alloy.CFG.size_100 }

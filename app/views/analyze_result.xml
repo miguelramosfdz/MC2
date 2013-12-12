@@ -26,7 +26,7 @@
 				<Require id="preferenceWho" src="elements/match_preference/who"/>
 			</ScrollableView>
 		
-			<View id="lblContinue" onClick="updateAccount">
+			<View id="lblContinue" onClick="updateUser">
 				<Label class="h3-bold label-continue">To Be Continued...</Label>
 				<Label class="h3-bold label-continue-2">V</Label>
 			</View>

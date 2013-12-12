@@ -1,3 +1,5 @@
+var Api = require('api');
+
 function showDialog(args) {
 	if (!args.buttonNames) {
 		args.buttonNames = ['OK'];
@@ -90,7 +92,7 @@ exports.capitalize = function (s) {
 /*
  @return default value of busy time  ([before 06:69, after: 22:59])
  * 10659 default value format: 1 => Before, 0659 => 06:59AM
- * 22259 default value format: 2 => Before, 2259 => 22:59PM
+ * 22259 default value format: 2 => After, 2259 => 22:59PM
  * */
 exports.busyTime = function() {
     return [ 10659, 22259 ];
@@ -117,4 +119,105 @@ exports.reverseToBusyString = function  ( time ) {
     }
     
     return result;
+};
+
+exports.startTrackingLocation = function (eventId, lat, lon) {
+    if ( !Ti.App.currentUser || !Ti.App.currentUser.id ) {
+        return;
+    }
+    Ti.API.error ('device starting tracking...' + lat + '...' + lon );
+
+    var location = require('location');
+        
+    Ti.App.Properties.setObject('_trackingEvent', { eventId: eventId } );
+        
+    location.tracking(new Date().getTime(), { latitude: lat || 0, longitude: lon || 0 } ); // test android device arrived
+    // location.tracking(new Date().getTime(), { latitude: 37.78583526611328, longitude: -122.40641784667969 }); // test ios simulator arrived
+};
+
+exports.trackingLocationResponse = function ( status ) {
+    if ( status == 1 ) {// arrived 
+    	var _trackingEvent = Ti.App.Properties.getObject('_trackingEvent', false);
+    	
+        if ( _trackingEvent ) {
+               //get event data
+            Api.getEventById ({ 
+                  event_id: _trackingEvent.eventId
+            },
+            function (res) {
+                if ( res && res.length ) {
+                    var event         = res[0],
+                        arrived_users = event.custom_fields.arrived_users;
+                        arrived_users = ( arrived_users ) ? arrived_users.split(',') : [];
+                    
+                    if ( arrived_users.indexOf (Ti.App.currentUser.id) == -1 ) {
+                       arrived_users.push ( Ti.App.currentUser.id );
+                    }
+                    
+                    var event_data = { 
+                        event_id : event.id,
+                        custom_fields: {
+                            arrived_users: arrived_users.join(',')  
+                        }
+                    };
+                    Api.updateEvent ( { data : JSON.stringify( event_data ) } );
+                }
+            });
+        } 
+    } else {
+        Api.push({ 
+            to_ids:  Ti.App.currentUser.id, 
+            payload:        JSON.stringify({
+            atras: 'track_timeout',
+                alert: 'MeetCute wasn’t able to confirm that you arrived the location. Please make sure to bring your phone with you next time.'
+            }) 
+        });
+    }
+    Ti.App.Properties.removeProperty('_trackingEvent');
+};
+
+exports.answerFeedback = function ( data ) {
+    if ( !Ti.App.currentUser || !Ti.App.currentUser.id ) {
+        return;
+    }
+    
+    //This is response format on android: {"atras":"feed_back","android":{"sound":"default","alert":"Did you see someone you'd like to cross paths with again?"},"crossPath":{"event":{"id":"52a7d7d1bc4dc20b1500064c","start_time":"2013-12-11T03:40:51+0000"},"place":{"address":"882 N Point St","name":"Black Point Cafe"}}}
+    var feedbackDialog =  Ti.UI.createAlertDialog({
+        title: 			data.eventName,
+        message: 		( OS_ANDROID ) ? data.android.alert : data.alert,
+        buttonNames: 	['YES', 'NO'] 
+    });
+     
+    feedbackDialog.show();
+    feedbackDialog.addEventListener ('click', function (e) {
+        //get event data
+        Api.getEventById ({ 
+            event_id: data.eventId
+        },
+        function (res) {
+            if ( res && res.length ) {
+                var event        = res[0],
+                    //new data to update
+                    event_update = { 
+                        event_id : event.id,
+                        custom_fields: {}
+                    };
+          
+                var _field      = ( !e.index ) ? 'feedback_yes' : 'feedback_no',// get field to update yes | no
+                    _field_data = event.custom_fields[ _field ]; 
+                    
+                // check exist data
+                _field_data = ( _field_data ) ? _field_data.split(',') : [];
+    
+                if ( _field_data.indexOf ( Ti.App.currentUser.id ) == -1 ) {
+                    _field_data.push ( Ti.App.currentUser.id );
+                }
+    
+                event_update.custom_fields[_field] = _field_data.join(',');
+                
+                //update event
+                Api.updateEvent ( { data : JSON.stringify( event_update ) } );
+            }
+        });
+    });
 };

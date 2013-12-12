@@ -1,25 +1,13 @@
 exports.init = function() {
-  	loadNav();
   	initYelp();
   	
   	Alloy.Globals.toggleAI(false);
 };
 
-function loadNav() {
-  	var btnBack = Ti.UI.createButton({ title: 'Back', width: Alloy.CFG.size_51, height: Alloy.CFG.size_30, top: Alloy.CFG.size_7 });
-	btnBack.addEventListener('click', function(){
-		Alloy.Globals.PageManager.loadPrevious();
-	});
-	
-  	$.nav.init({
-  		title: 'Search Place',
-		left: btnBack
-	});
-}
-
 function initYelp() {
 	// Refer here for Yelp Search API - http://www.yelp.com/developers/documentation/v2/search_api
-	var userLocation = Ti.App.currentUser['custom_fields']['coordinates'] && Ti.App.currentUser['custom_fields']['coordinates'][0];
+	// var userLocation = Ti.App.currentUser['custom_fields']['coordinates'] && Ti.App.currentUser['custom_fields']['coordinates'][0];
+	var userLocation = [-122.417614, 37.781569]; //TODO: test fot VN
 	
 	$.yelp.setSearchParams(['ll=' + userLocation[1] + ',' + userLocation[0] , 'limit=20', 'sort=2']);
 	$.yelp.setHandlers({
@@ -41,11 +29,20 @@ function initYelp() {
                         display_address:    b.location.display_address,
                         city:               b.location.city
                     };
-
-			        data.push(Ti.UI.createTableViewRow({ title: b.name, place: business, height: Alloy.CFG.size_40, font: { fontSize: Alloy.CFG.size_14, fontFamily: 'AGaramondPro-Regular' }, color: '#000' }));
+					
+					var row = Ti.UI.createTableViewRow({ place: business, height: Alloy.CFG.size_40, layout: 'horizontal', hasChild: true });
+						row.add( Ti.UI.createLabel({ text: b.name, font: { fontSize: Alloy.CFG.size_14, fontWeight: 'bold' }, color: '#000', height: Alloy.CFG.size_40, left: Alloy.CFG.size_10 }) );
+						row.add( Ti.UI.createLabel({ text: '(' + b.location.display_address[0] + ')', font: { fontSize: Alloy.CFG.size_12 }, color: '#000', height: Alloy.CFG.size_20, top: Alloy.CFG.size_10, left: Alloy.CFG.size_5, right: Alloy.CFG.size_10, wordWrap: false, ellipsize: true }) );
+			        data.push(row);
 			    }
 			});
 			$.placesTbl.setData(data);
+		},
+		error: function(e) {
+			Alloy.Globals.Common.showDialog({
+				title: 'Error',
+				message: JSON.parse(e.text).error.text
+			});
 		}
 	});
 }

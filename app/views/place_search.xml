@@ -1,11 +1,6 @@
 <Alloy>
 	<View class="page">
-		<Widget id="nav" src="navigation_group"/>
-		<View class="body">
-			
-            <Widget src="com.imobicloud.yelp" id="yelp"/>
-            <TableView id="placesTbl" onClick="pickPlace"/>
-            
-		</View>
+        <Widget src="com.imobicloud.yelp" id="yelp"/>
+        <TableView id="placesTbl" onClick="pickPlace"/>
 	</View>
 </Alloy>

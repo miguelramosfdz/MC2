@@ -119,8 +119,8 @@ function updateSex(values) {
   	$.valuePicker.hide();
 }
 
-// update new Account information
-function updateAccount ( e ) {
+// update new User information
+function updateUser ( e ) {
 	var custom_fields = currentUser.custom_fields;
 	
 	var who = $.preferenceWho.get();

@@ -13,6 +13,8 @@ exports.init = function() {
 	Alloy.Globals.toggleAI(false);
 };
 
+exports.unload = saveInfo;
+
 function loadNav() {
 	var btnMenu = Alloy.createController('elements/button', {
 		icon: { width: Alloy.CFG.size_16, height: Alloy.CFG.size_15, backgroundImage: '/images/nav/btn-menu.png' },
@@ -21,16 +23,9 @@ function loadNav() {
 		}
 	}).getView();
 	
-	var btnSave = Ti.UI.createButton({ title: 'Save', width: Alloy.CFG.size_51, height: Alloy.CFG.size_30, top: Alloy.CFG.size_7 });
-    
-    btnSave.addEventListener('click', function(){
-        saveInfo();
-    });
-    
   	$.nav.init({
   		title: 'Match preference',
-		left: btnMenu,
-		right: btnSave
+		left: btnMenu
 	});
 }
 
@@ -41,7 +36,6 @@ function loadUserInfo() {
 		busy_weekdays = Alloy.Globals.Common.busyTime[0],
 		busy_weekends = Alloy.Globals.Common.busyTime[1];
 		
-        
 	if ( currentUser.custom_fields ) {
 		var custom_fields = currentUser.custom_fields;
 		
@@ -61,8 +55,8 @@ function loadUserInfo() {
 	});
     
     $.preferenceWhen.set({
-        busy_weekdays: Alloy.Globals.Common.reverseToBusyString( Alloy.Globals.Common.busyTime()[0] ),
-        busy_weekends: Alloy.Globals.Common.reverseToBusyString( Alloy.Globals.Common.busyTime()[1] )
+        busy_weekdays: Alloy.Globals.Common.reverseToBusyString( busy_weekdays ),
+        busy_weekends: Alloy.Globals.Common.reverseToBusyString( busy_weekends )
     });
     
 	$.ageSlider.setProperties({
@@ -148,29 +142,22 @@ function saveInfo () {
     var when = $.preferenceWhen.get();
     
     custom_fields['busy_weekdays']  = ( when.busy_weekdays ) ? Alloy.Globals.Common.formatBusyTime( when.busy_weekdays_text, when.busy_weekdays ): Alloy.Globals.Common.busyTime()[0];// 10659 default value format: 1 => Before, 0659 => 06:59AM
-    custom_fields['busy_weekends']  = ( when.busy_weekends ) ? Alloy.Globals.Common.formatBusyTime( when.busy_weekends_text, when.busy_weekends ): Alloy.Globals.Common.busyTime()[1]; //22259 default value format: 2 => Before, 2259 => 22:59PM
+    custom_fields['busy_weekends']  = ( when.busy_weekends ) ? Alloy.Globals.Common.formatBusyTime( when.busy_weekends_text, when.busy_weekends ): Alloy.Globals.Common.busyTime()[1]; //22259 default value format: 2 => After, 2259 => 22:59PM
     
-    Alloy.Globals.toggleAI(true);
+    // Alloy.Globals.toggleAI(true);
 
     Cloud.Users.update( {
         custom_fields: custom_fields
     }, function (e) {
-        Alloy.Globals.toggleAI(false);
+        // Alloy.Globals.toggleAI(false);
         if (e.success) {
             if ( e.users[0] ) {
                 Ti.App.currentUser = e.users[0];
                 Alloy.Globals.Common.cacheUser();
-                
-                Alloy.Globals.Common.showDialog({
-                    title:      'Match Preference',
-                    message:    'Your changes were saved.'
-                });
             }
-        } else {
-            Alloy.Globals.Common.showDialog({
-                title:      'Error',
-                message:    e.error && e.message,
-            });
+        } 
+        else {
+            Ti.API.error ('Error: \n\t' +  e.error && e.message );
         }
     });
 }

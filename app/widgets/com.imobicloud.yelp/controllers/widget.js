@@ -55,17 +55,13 @@ var handlers = {};
 var searchParams = [];
 
 // react to changes in the model state
-model.on('change:loading', function(m) {
-	if (m.get('loading')) {
-		$.searchView.touchEnabled = false;
-		$.search.opacity = 0;
-		$.loading.setOpacity(1.0);
-	} else {
-		$.loading.setOpacity(0);
-		$.search.opacity = 1;
-		$.searchView.touchEnabled = true;
-	}
-});
+// model.on('change:loading', function(m) {
+	// if (m.get('loading')) {
+		// $.loading.setOpacity(1.0);
+	// } else {
+		// $.loading.setOpacity(0);
+	// }
+// });
 
 ////////////////////////////////////
 ///////// public functions /////////
@@ -136,7 +132,7 @@ function search() {
 	// search Yelp API
 	model.set('loading', true);
 	
-	var yelp = require('yelp');
+	var yelp = require('yelp_api');
 		yelp.init();
 		
 	yelp.search( 

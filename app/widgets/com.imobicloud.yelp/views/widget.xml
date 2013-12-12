@@ -1,10 +1,5 @@
 <Alloy>
-	<View id="bar">
-            <TextField id="text" onReturn="search"/>
-            <View class="divider"/>
-            <View id="searchView" onClick="search">
-                    <ImageView id="search"/>
-                    <Require type="widget" src="com.appcelerator.loading" id="loading"/>
-            </View>
+	<View class="searchbar">
+		<SearchBar id="text" onReturn="search"/>
     </View>
 </Alloy>

@@ -1,7 +1,9 @@
+var args = arguments[0] || {};
+
 exports.init = function() {
   	loadNav();
   	
-    var url = 'http://m.yelp.com/search?find_desc=pho&find_loc=Chicago%2C+IL';
+    var url = args.url || 'http://m.yelp.com/search?find_desc=pho&find_loc=Chicago%2C+IL';
 
   	$.browser.init({
   		url: url,

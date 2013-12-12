@@ -1,4 +1,6 @@
 exports.init = function(params) {
+	Alloy.Globals.loggedIn = true;
+	
 	loadHomepage( arguments[0] || {} );
 };
 
@@ -35,12 +37,22 @@ function loadHomepage( args ) {
 	var container = Ti.UI.createView({  });
 	
 	var oPageManager = require('page_manager');
-		pageManager = new oPageManager();
+		pageManager = new oPageManager(),
+		defaultPage = 'someone_like',
+		defaultPageData = null;
+  	
+  	var appRedirect = Ti.App.Properties.getObject('appRedirect');
+  	if (appRedirect) {
+  		defaultPage = appRedirect.url;
+  		defaultPageData = appRedirect.data;
+  		Ti.App.Properties.removeProperty('appRedirect');
+  	}
   	
 	pageManager.init({
 		onChange: onChange,
 		container: container,
-		defaultPage: 'someone_like'
+		defaultPage: defaultPage,
+		defaultPageData: defaultPageData
 	});
 		
 	Alloy.Globals.PageManager = pageManager;

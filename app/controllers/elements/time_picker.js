@@ -21,6 +21,12 @@ function hidePicker(e) {
 exports.hide = hidePicker;
 
 function setTime(e) {
-	// TODO: this function fire 2 time on android
-	callback( e.value || $.timePicker.value );
+	if (OS_IOS) {
+		callback( $.timePicker.value );
+	} else {
+	    //TODO: callback is called double.
+		if (e.cancel === false) {
+			callback( e.value );
+		}
+	}
 }

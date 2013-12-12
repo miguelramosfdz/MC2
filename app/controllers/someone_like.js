@@ -40,7 +40,25 @@ exports.init = function() {
   	vars.photoPath = photoPath;
   	
   	getFeeds();
+  	
+  	onLoggedIn();
 };
+
+function onLoggedIn() {
+	var onLoggedInCbl = Ti.App.Properties.getObject('onLoggedIn', false);
+	
+	if ( !onLoggedInCbl ) {
+		return;
+	}
+	
+	Ti.App.Properties.removeProperty('onLoggedIn');
+	
+	switch( onLoggedInCbl.action ) {
+		case 'answerFeedback':
+            Alloy.Globals.Common.answerFeedback( onLoggedInCbl.data );
+            break;
+    }
+}
 
 function loadNav() {
 	var btnMenu = Alloy.createController('elements/button', {
@@ -107,7 +125,7 @@ function loadFeeds(users) {
 	  	vars.dataIndex = ii - 1;
 	  	vars.containerIndex = 0;
 	  	
-	  	vars.swipeEnable = true;
+	  	vars.swipeEnable = len > 1;
 	  	$.card_0.parent.addEventListener('swipe', listSwipe);
 	}
 	
@@ -120,7 +138,7 @@ function loadCard(dataIndex, containerIndex) {
 	var card = Ti.UI.createView();
 		card.add( Ti.UI.createImageView({ image: user.photo.urls[vars.photoPath], width: Alloy.CFG.size_280, height: Alloy.CFG.size_280, top: 0 }) );
 		card.add( Ti.UI.createImageView({ image: '/images/someone_like/gradient.png', width: Alloy.CFG.size_280, height: Alloy.CFG.size_280, top: 0 }) );
-		card.add( Ti.UI.createButton({ eleType: 'button-like', userId: user.id, gender: user.custom_fields._gender, liked: user.custom_fields.liked, opacity: 0.5, backgroundImage: '/images/someone_like/love.png', width: Alloy.CFG.size_70, height: Alloy.CFG.size_63, top: Alloy.CFG.size_255 }) );
+		card.add( Ti.UI.createButton({ eleType: 'button-like', userId: user.id, gender: user.custom_fields._gender, liked: user.custom_fields.liked, device_token: user.custom_fields.device_token, opacity: 0.5, backgroundImage: '/images/someone_like/love.png', width: Alloy.CFG.size_70, height: Alloy.CFG.size_63, top: Alloy.CFG.size_255 }) );
 	
 	var container = $['card_' + containerIndex];
 	container.userId = user.id;
@@ -200,10 +218,19 @@ function like(e) {
 	  		if ( photo.liked.indexOf( Ti.App.currentUser.id ) == -1 ) {
 				loadAnimation(photo.parent, photo.gender);
 			} else {
-				photo.parent.add( Alloy.createController('elements/someone_like/match_found', { gender: photo.gender }).getView() );				
+				photo.parent.add( Alloy.createController('elements/someone_like/match_found', { gender: photo.gender }).getView() );			
+				
+				// Send push notifications to liked user
+				Api.push({ 
+		    		to_ids: 	photo.userId, 
+		    		payload: 	JSON.stringify({
+					    atras: 'someone_like',
+					    alert: 'Someone liked you too! Next time you are nearby MeetCute will help you cross paths.'
+					}) 
+		    	});
 			}
   		} else {
-  			vars.likeMessage.animate({ opacity: 0, duration: 500 }, function() {
+  			vars.likeMessage && vars.likeMessage.animate({ opacity: 0, duration: 500 }, function() {
 				var message = vars.likeMessage;
 				message.parent.remove(message);
 				vars.likeMessage = null;

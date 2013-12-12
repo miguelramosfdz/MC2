@@ -11,6 +11,7 @@ function PageManager() {
 	args = {
 		container: element,
 	 	defaultPage: '',
+	 	defaultPageData: null,
 		onChange: function(status, params){
 			status = 
 			  - 0: start load
@@ -28,7 +29,8 @@ function PageManager() {
 	  	UIManager = new oUIManager(UIChange);
 		
 		args.defaultPage && load({
-			url: args.defaultPage
+			url: args.defaultPage,
+			data: args.defaultPageData
 		});
 	  	
 	  	Ti.API.log('Page Manager: initialized');

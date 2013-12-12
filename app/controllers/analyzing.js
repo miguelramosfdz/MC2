@@ -28,7 +28,8 @@ function setupFB() {
 	fb.appid = Ti.App.Properties.getString('ti.facebook.appid');
 	fb.permissions = ['email', 'user_birthday', 'user_checkins', 'user_friends', 'user_hometown', 'user_location', 'user_interests', 'user_photos', 'user_relationships',
 						'friends_birthday', 'friends_hometown', 'friends_location', 'friends_photos'];
-	fb.forceDialogAuth = true;
+	// Set to false to enable Single-Sign-On (SSO) in cases where the official Facebook app is on the device
+	fb.forceDialogAuth = false;
 	
 	fb.addEventListener('login', function(e) {
 		Alloy.Globals.toggleAI(false);
@@ -45,7 +46,6 @@ function setupFB() {
 		            title:		'Facebook Error',
 		            message:	e.error,
 		        });
-		        
 	    	} else {
 	    		// Something wrong with Facebook
 		        Alloy.Globals.Common.showDialog({
@@ -129,7 +129,7 @@ function loginWithFacebook( fbID ) {
 		    if (e.success) {
 		       	var user = e.users[0];
 				
-				if ( user['custom_fields'] && user['custom_fields']['device_token'] ) {
+				if ( user.photo && user['custom_fields'] && user['custom_fields']['device_token'] ) {
 					Ti.App.currentUser = user;
 					Alloy.Globals.Common.cacheUser();
 					vars.finishLoading = 1;

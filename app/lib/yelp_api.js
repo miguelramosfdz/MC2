@@ -5,11 +5,10 @@
 		yelp.search( ['term=' + 'food', 'location=' + 'San+Francisco'].join('&') );
 */
 
+Ti.include('jsOAuth.js');
 var oauth;
 
 exports.init = function() {
-	Ti.include("jsOAuth.js");
- 
 	oauth = OAuth({
 		consumerKey : 		"O1iopa3tzoFJRZBipxkGpw",
 		consumerSecret : 	"CFfci8YaE0-uceedJjmhb36vTbo",

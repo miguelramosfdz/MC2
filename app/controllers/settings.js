@@ -32,6 +32,7 @@ function logout() {
 	
 	    	Ti.App.Properties.setObject('currentUser', false );
 	    	Ti.App.currentUser = false;
+	    	Alloy.Globals.loggedIn = false;
 	    	
 	        Alloy.Globals.WinManager.load({
 	        	url: 'analyzing'

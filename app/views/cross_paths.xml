@@ -17,8 +17,8 @@
 				</View>
 				
 				<View class="button button-view-map" onClick="showMap">
-					<ImageView class="button-icon icon-map"/>
 					<Label class="button-label map-link">view map</Label>
+					<ImageView class="button-icon icon-map"/>
 				</View>
 			</View>
 			
@@ -30,6 +30,16 @@
 			<View id="btnIWillBeThere" class="button button-ok" onClick="clickOnIWillBeThere">
 				<ImageView class="button-icon icon-ok"/>
 				<Label class="button-label">i'll be there</Label>
+			</View>
+			
+			
+			<View class="divider">
+				<Label class="dot">.</Label>
+				<Label class="dot">.</Label>
+				<Label class="dot">.</Label>
+				<Label class="dot">.</Label>
+				<Label class="dot">.</Label>
+				<Label class="dot">.</Label>
 			</View>
 			
 			<!-- time picker -->

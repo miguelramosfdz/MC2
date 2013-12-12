@@ -1,7 +1,7 @@
 ".wrapper": { layout: 'vertical' }
 	"Label": { color: '#fff' }
 	".title": { top: Alloy.CFG.size_30, font: { fontSize: Alloy.CFG.size_12 } }
-	".place": { top: Alloy.CFG.size_40, font: { fontSize: Alloy.CFG.size_20 } }
+	".place": { top: Alloy.CFG.size_40, font: { fontSize: Alloy.CFG.size_20 }, textAlign: 'center' }
 	".address": { height: Ti.UI.SIZE, top: Alloy.CFG.size_5, bottom: Alloy.CFG.size_5, font: { fontSize: Alloy.CFG.size_13 } }
 	".time": { font: { fontSize: Alloy.CFG.size_20 } }
 	".countdown": { top: Alloy.CFG.size_40, font: { fontSize: Alloy.CFG.size_12 } }

@@ -24,7 +24,7 @@
 				</View>
 			</View>
 			
-			<Label id="lblNotification" class="intro">*notifications will be sent in 1 min</Label>
+			<Label id="lblNotification" class="intro">*notifications will be sent in 60 seconds</Label>
 			
 		</View>
 	</View>

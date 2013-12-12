@@ -1,4 +1,5 @@
 "#placesTbl": {
-        top: "50dp",
-        bottom: 0
+    top: Alloy.CFG.size_38,
+    bottom: 0,
+    backgroundColor: '#fff'
 }
