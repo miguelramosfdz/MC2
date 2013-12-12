@@ -160,10 +160,11 @@ function surpriseMe() {
     // get data from cache
     if ( businesses.length > 0 ) {
         generateSurprisePlace ();
+        
     } else {
         Alloy.Globals.toggleAI(true);
-        var userLocation = [-122.417614, 37.781569], // TODO - Yelp not work in VN :(
-		// var userLocation = Ti.App.currentUser['custom_fields']['coordinates'] && Ti.App.currentUser['custom_fields']['coordinates'][0],
+        
+		var userLocation = Ti.App.currentUser['custom_fields']['coordinates'] && Ti.App.currentUser['custom_fields']['coordinates'][0],
 	        searchParams = ['ll=' + userLocation[1] + ',' + userLocation[0] , 'limit=20', 'sort=2','category_filter=coffee'];
         
         yelp.search( 
