@@ -160,10 +160,8 @@ function surpriseMe() {
     // get data from cache
     if ( businesses.length > 0 ) {
         generateSurprisePlace ();
-        
     } else {
         Alloy.Globals.toggleAI(true);
-        
 		var userLocation = Ti.App.currentUser['custom_fields']['coordinates'] && Ti.App.currentUser['custom_fields']['coordinates'][0],
 	        searchParams = ['ll=' + userLocation[1] + ',' + userLocation[0] , 'limit=20', 'sort=2','category_filter=coffee'];
         
@@ -220,7 +218,6 @@ function generateSurprisePlace () {
 	        };
 	        
 	        generateSurpriseTime( 5 );// each 5 minutes once
-	        
 	        $.btnIWillBeThere.show();
 	    }
 	}
@@ -256,7 +253,8 @@ function checkBusyTime(range) {
 	// e.g : 12030 => before 20:30 (PM) , 22030 => after 20:30 (PM)
 	
 	var custom_fields = Ti.App.currentUser['custom_fields'],
-		strTime = '' + ( ( new Date().getDay() < 5 ) ? custom_fields.busy_weekdays : custom_fields.busy_weekends ),
+	    weekday = new Date().getDay(),
+		strTime = '' + ( ( weekday != 0 || weekday != 6 ) ? custom_fields.busy_weekdays : custom_fields.busy_weekends ),
   		prefix  = strTime.substr(0, 1),
         hours   = strTime.substr(1, 2),
         minutes = strTime.substr(3);
@@ -265,16 +263,16 @@ function checkBusyTime(range) {
 	busy_time.setHours(hours);
 	busy_time.setMinutes(minutes);
 	
-	// before
-	if (prefix == '1') {
-		if (range[1] > busy_time.getHours()) {
-			range[1] = busy_time.getHours();
-		}
-	} 
 	// after
+	if (prefix == '2') {
+		if (range[1] > busy_time.getHours()) {
+			range[1] = busy_time.getHours() - 1;
+		}
+	}
+	// before
 	else {
 		if (range[0] < busy_time.getHours()) {
-			range[0] = busy_time.getHours();
+			range[0] = busy_time.getHours() + 1;
 		}
 	}
 	
