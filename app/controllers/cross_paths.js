@@ -2,10 +2,18 @@ var crossPath   = {},
     businesses  = [],
     moment      = require('alloy/moment'),
     yelp        = require('yelp_api'),
-    Api         = require('api');
+    Api         = require('api'),
+    timer       = null;
 
 exports.init = function() {
-    checkCrossPath();
+    // check this to make sure no more cross path be created on during a cross path is processing...
+    var locked = Ti.App.Properties.getBool('lock_cross_path', false);
+    
+    if ( locked ) {
+        checkCreateCrossFinished();
+    } else {
+        checkCrossPath();
+    }
 };
 
 exports.reload = function(data) {
@@ -21,6 +29,19 @@ exports.reload = function(data) {
 		crossPath['place'] = data.place;
 	}
 };
+
+function checkCreateCrossFinished () {
+    timer = setInterval( function() {
+        var locked = Ti.App.Properties.getBool('lock_cross_path', false);
+        
+        // if creating the cross path is finished 
+        if ( !locked ) {
+            clearInterval( timer );
+            timer = null;
+            checkCrossPath();
+        }
+    }, 1000 );
+}
 
 function checkCrossPath () {
     Alloy.Globals.toggleAI(true);
@@ -162,37 +183,51 @@ function surpriseMe() {
         generateSurprisePlace ();
     } else {
         Alloy.Globals.toggleAI(true);
-		var userLocation = Ti.App.currentUser['custom_fields']['coordinates'] && Ti.App.currentUser['custom_fields']['coordinates'][0],
-	        searchParams = ['ll=' + userLocation[1] + ',' + userLocation[0] , 'limit=20', 'sort=2','category_filter=coffee'];
-        
-        yelp.search( 
-            searchParams.join('&'),
-            function (data) {
-                try {
-                    var _businesses = JSON.parse(data.text).businesses;
-                    _businesses = _.where( _businesses, { is_closed: false } );
-
-                    businesses = _businesses;
-                    generateSurprisePlace();
-                    
-                } catch (e) {
-                	Alloy.Globals.Common.showDialog({
-	                   title:      'Yelp Error',
-	                   message:    'Invalid response from server. Try again.'
-	                });
-                    Alloy.Globals.toggleAI(false);
+        //var currentLocation = [-122.417614, 37.781569];
+		var currentLocation = Ti.App.currentUser['custom_fields']['coordinates'] && Ti.App.currentUser['custom_fields']['coordinates'][0];
+	    
+	    if ( currentLocation ) {
+            setYelpParams ( currentLocation );
+        } else {
+            Alloy.Globals.Common.getCurrentLocation ( function (coords) {
+                if (coords && coords.longitude && coords.latitude) {
+                    setYelpParams ( [ coords.longitude, coords.latitude ] );
                 }
-            },
-            function(e) {
+            });
+        }
+    }
+}
+
+function setYelpParams ( currentLocation ) {
+    var searchParams = ['ll=' + currentLocation[1] + ',' + currentLocation[0] , 'limit=20', 'sort=2','category_filter=coffee'];
+        
+    yelp.search( 
+        searchParams.join('&'),
+        function (data) {
+            try {
+                var _businesses = JSON.parse(data.text).businesses;
+                _businesses = _.where( _businesses, { is_closed: false } );
+
+                businesses = _businesses;
+                generateSurprisePlace();
+                
+            } catch (e) {
                 Alloy.Globals.Common.showDialog({
                    title:      'Yelp Error',
-                   message:    'There was an error processing your request. Make sure you have a network connection and try again.'
+                   message:    'Invalid response from server. Try again.'
                 });
-                Ti.API.error('[ERROR] ' + (e.error || JSON.stringify(e)));
                 Alloy.Globals.toggleAI(false);
             }
-        );
-    }
+        },
+        function(e) {
+            Alloy.Globals.Common.showDialog({
+               title:      'Yelp Error',
+               message:    'There was an error processing your request. Make sure you have a network connection and try again.'
+            });
+            Ti.API.error('[ERROR] ' + (e.error || JSON.stringify(e)));
+            Alloy.Globals.toggleAI(false);
+        }
+    );
 }
 
 function generateSurprisePlace () {

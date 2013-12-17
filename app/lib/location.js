@@ -53,7 +53,7 @@ function checkPermission() {
 }
 
 function registerService(e) {
-	var interval = 5000;
+	var interval = 3 * 60 * 1000;// 3mins
 	
 	Ti.App.Properties.setDouble('locationTime', locationTime);
 	Ti.App.Properties.setInt('locationTimeExpired', locationTimeExpired);

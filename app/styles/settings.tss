@@ -10,3 +10,6 @@
 	
 ".button-delete": { bottom: Alloy.CFG.size_60 }
 	".icon-delete": { width: Alloy.CFG.size_30, height: Alloy.CFG.size_30, image: '/images/settings/delete.png' }	
+
+//TODO for testing
+".version": { bottom: Alloy.CFG.size_20  }

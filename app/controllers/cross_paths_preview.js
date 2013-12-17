@@ -32,7 +32,12 @@ vars.createOnExit = vars.mode != 'old';
 
 exports.init = function() {
   	loadNav();
-  	loadCrossPath();
+  	if ( vars.mode == 'review' && vars.event_id ) {
+  	    loadReview( vars.event_id );
+  	} else {
+  	    loadCrossPath();
+  	}
+  	
   	Alloy.Globals.toggleAI(false);
 };
 
@@ -146,6 +151,9 @@ function isActivePage() {
 }
 
 function createCrossPath (noCallback) {
+    // begin create cross path, set this true to unable to create more cross path if user unload page and click on Cross Path menu
+    Ti.App.Properties.setBool('lock_cross_path', true);
+    
     if ( !noCallback ) {
         Alloy.Globals.toggleAI(true);
     }
@@ -212,7 +220,7 @@ function filterError(e) {
 }
 
 function filterSuccess(users) {
-    var userIds     = [];
+    var userIds = [];
 
     for ( var i = 0, len = users.length; i < len; i++ ) {
     	var user = users[i];
@@ -223,8 +231,8 @@ function filterSuccess(users) {
     
     //add more information into crossPath[event] object
     var crossPath = vars.crossPath;
-
-    crossPath['event']['matched_users']  = userIds.join(',');//userIds.slice(0, index).join(','); 
+    
+    crossPath['event']['matched_users']  = userIds.slice(0, index).join(','); 
     
     // does not show alert response if the user leave this screen
     Api.crossPath( 
@@ -246,6 +254,8 @@ function filterSuccess(users) {
 	    	    
 	    	    Alloy.Globals.toggleAI(false);
     	    }
+    	    // create cross path finished, set this false to unlock
+    	    Ti.App.Properties.setBool('lock_cross_path', false);
     	}
     );
 }
@@ -254,7 +264,7 @@ function goBack(e) {
 	var dialog = Ti.UI.createAlertDialog({
 		buttonNames: ['No', 'Yes'],
 		cancel: 0,
-		message: '￼Are you sure you want to cancel this place & time?￼'
+		message: 'Are you sure want to cancel this place & time?'
 	});
 	dialog.show();
 	dialog.addEventListener('click', function(e) {
@@ -319,4 +329,35 @@ function updateEvent ( res ) {
             }
         });
     }
+}
+
+function loadReview ( event_id ) {
+    Alloy.Globals.toggleAI(true);
+    
+    Api.getEventById ({ 
+        event_id: event_id
+    },
+    function (res) {
+        if ( res && res.length ) {
+            var event = res[0];
+            
+            vars.crossPath = {
+                event: {
+                    id:         event.id,
+                    start_time: event.start_time,
+                },
+                place: {
+                    name:     event.place['name'],
+                    address:  [event.place['address']],
+                }
+             };
+             loadCrossPath();
+        } else {
+            Alloy.Globals.Common.showDialog({
+                title:      'Error',
+                message:    'Sorry, Cross Paths is not found.'
+            });
+        }
+        Alloy.Globals.toggleAI(false);
+    });
 }

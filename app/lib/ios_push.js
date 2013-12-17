@@ -42,13 +42,13 @@ function receivePush(e) {
         		Alloy.Globals.PageManager.load({
 					url:        'cross_paths_preview',
 	                isReset:    true,
-	                data:       { mode: 'review', crossPath: data.crossPath }
+	                data:       { mode: 'review', event_id: data.event_id }
 				}); 
         	} else {
 	        	Ti.App.Properties.setObject('appRedirect', {
 					url:        'cross_paths_preview',
 	                isReset:    true,
-	                data:       { mode: 'review', crossPath: data.crossPath }
+	                data:       { mode: 'review', event_id: data.event_id }
 				});
 			}
 			break;

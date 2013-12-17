@@ -191,6 +191,11 @@ exports.answerFeedback = function ( data ) {
     feedbackDialog.show();
     feedbackDialog.addEventListener ('click', function (e) {
         //get event data
+        if (e.index < 0) {
+            feedbackDialog.show();
+            return;
+        }
+        
         Api.getEventById ({ 
             event_id: data.eventId
         },
@@ -220,4 +225,29 @@ exports.answerFeedback = function ( data ) {
             }
         });
     });
+};
+
+exports.getCurrentLocation = function ( callback ) {
+    
+    if ( Ti.Geolocation.locationServicesEnabled ) {
+        Alloy.Globals.toggleAI(true);
+        
+        Ti.Geolocation.purpose = 'Get Current Location';
+        Ti.Geolocation.getCurrentPosition(function( e ) {
+            if ( e.success && e.coords ) {
+                callback && callback ( e.coords );
+            } else {
+                Alloy.Globals.Common.showDialog({
+                    title:      'Warning',
+                    message:    'Sorry. We can\'t detect your current Location.',
+                });
+            }
+            Alloy.Globals.toggleAI(false);
+        });
+    } else {
+        Alloy.Globals.Common.showDialog({
+            title:      'Warning',
+            message:    'Location service on your device is turned off. Can\'t detect your current Location.',
+        });
+    }
 };

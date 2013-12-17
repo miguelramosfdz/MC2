@@ -6,18 +6,31 @@ exports.init = function() {
 
 function initYelp() {
 	// Refer here for Yelp Search API - http://www.yelp.com/developers/documentation/v2/search_api
-	// var userLocation = Ti.App.currentUser['custom_fields']['coordinates'] && Ti.App.currentUser['custom_fields']['coordinates'][0];
-	var userLocation = [-122.417614, 37.781569]; //TODO: test fot VN
+	var currentLocation = Ti.App.currentUser['custom_fields']['coordinates'] && Ti.App.currentUser['custom_fields']['coordinates'][0];
 	
-	$.yelp.setSearchParams(['ll=' + userLocation[1] + ',' + userLocation[0] , 'limit=20', 'sort=2']);
-	$.yelp.setHandlers({
-		success: function(businesses) {
-			var data = [];
+	// var currentLocation = [-122.417614, 37.781569]; // only for test
+	
+	if ( currentLocation ) {
+	    setYelpParams ( currentLocation );
+	} else {
+	    Alloy.Globals.Common.getCurrentLocation ( function (coords) {
+            if (coords && coords.longitude && coords.latitude) {
+                setYelpParams ( [ coords.longitude, coords.latitude ] );
+            }
+        });
+	}
+}
+
+function setYelpParams ( currentLocation ) {
+    $.yelp.setSearchParams(['ll=' + currentLocation[1] + ',' + currentLocation[0] , 'limit=20', 'sort=2']);
+    $.yelp.setHandlers({
+        success: function(businesses) {
+            var data = [];
             
-			_.each(businesses, function(b) {
+            _.each(businesses, function(b) {
                 //does not show the business has been (permanently) closed
-			    if ( !b.is_closed ) {
-			        var business = {
+                if ( !b.is_closed ) {
+                    var business = {
                         yelpId:     b.id,
                         name:       b.name,
                         website:    b.url,
@@ -29,22 +42,26 @@ function initYelp() {
                         display_address:    b.location.display_address,
                         city:               b.location.city
                     };
-					
-					var row = Ti.UI.createTableViewRow({ place: business, height: Alloy.CFG.size_40, layout: 'horizontal', hasChild: true });
-						row.add( Ti.UI.createLabel({ text: b.name, font: { fontSize: Alloy.CFG.size_14, fontWeight: 'bold' }, color: '#000', height: Alloy.CFG.size_40, left: Alloy.CFG.size_10 }) );
-						row.add( Ti.UI.createLabel({ text: '(' + b.location.display_address[0] + ')', font: { fontSize: Alloy.CFG.size_12 }, color: '#000', height: Alloy.CFG.size_20, top: Alloy.CFG.size_10, left: Alloy.CFG.size_5, right: Alloy.CFG.size_10, wordWrap: false, ellipsize: true }) );
-			        data.push(row);
-			    }
-			});
-			$.placesTbl.setData(data);
-		},
-		error: function(e) {
-			Alloy.Globals.Common.showDialog({
-				title: 'Error',
-				message: JSON.parse(e.text).error.text
-			});
-		}
-	});
+                    
+                    var row = Ti.UI.createTableViewRow({ place: business, height: Alloy.CFG.size_40, layout: 'horizontal', hasChild: true });
+                        row.add( Ti.UI.createLabel({ text: b.name, font: { fontSize: Alloy.CFG.size_14, fontWeight: 'bold' }, color: '#000', height: Alloy.CFG.size_40, left: Alloy.CFG.size_10 }) );
+                        row.add( Ti.UI.createLabel({ text: '(' + b.location.display_address[0] + ')', font: { fontSize: Alloy.CFG.size_12 }, color: '#000', height: Alloy.CFG.size_20, top: Alloy.CFG.size_10, left: Alloy.CFG.size_5, right: Alloy.CFG.size_10, wordWrap: false, ellipsize: true }) );
+                    data.push(row);
+                }
+            });
+            $.placesTbl.setData(data);
+        },
+        error: function(e) {
+            Alloy.Globals.Common.showDialog({
+                title: 'Error',
+                message: JSON.parse(e.text).error.text
+            });
+        },
+        cancel: function(e) {
+        	Alloy.Globals.PageManager.loadPrevious();
+        }
+    });
+    $.yelp.focus();
 }
 
 exports.unload = function() {

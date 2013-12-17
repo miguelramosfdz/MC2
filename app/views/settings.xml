@@ -18,6 +18,8 @@
 				<Label class="button-label">Delete Account</Label>
 			</View>
 			
+			<!--TODO for testing-->
+			<Label class="button-label version" >Version 1.1</Label>
 		</View>
 	</View>
 </Alloy>

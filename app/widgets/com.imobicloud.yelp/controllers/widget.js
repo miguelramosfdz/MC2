@@ -47,7 +47,7 @@
  */
 
 
-var HANDLERS = ['success','error'];
+var HANDLERS = ['success','error', 'cancel'];
 
 var AppModel = require('alloy/backbone').Model.extend({ loading: false });
 var model = new AppModel();
@@ -82,6 +82,10 @@ exports.setHandlers = function(args) {
 			handlers[h] = args[h];
 		}
 	});
+};
+
+exports.focus = function() {
+	$.text.focus();
 };
 
 exports.setSearchParams = function(params) {
@@ -153,4 +157,10 @@ function search() {
 			model.set('loading', false);
 		}
 	);
+}
+
+function cancel(e) {
+  	if (handlers.cancel) {
+		handlers.cancel();
+	}
 }

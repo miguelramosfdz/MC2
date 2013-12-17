@@ -1,5 +1,5 @@
 <Alloy>
 	<View class="searchbar">
-		<SearchBar id="text" onReturn="search"/>
+		<SearchBar id="text" onReturn="search" onCancel="cancel"/>
     </View>
 </Alloy>

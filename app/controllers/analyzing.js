@@ -6,7 +6,7 @@ var Cloud = require('ti.cloud'),
 Cloud.debug = true;
 
 exports.init = function() {
-	getCurrentCity();
+	getCurrentLocation();
 	
 	setupFB();
 };
@@ -29,7 +29,7 @@ function setupFB() {
 	fb.permissions = ['email', 'user_birthday', 'user_checkins', 'user_friends', 'user_hometown', 'user_location', 'user_interests', 'user_photos', 'user_relationships',
 						'friends_birthday', 'friends_hometown', 'friends_location', 'friends_photos'];
 	// Set to false to enable Single-Sign-On (SSO) in cases where the official Facebook app is on the device
-	fb.forceDialogAuth = false;
+	fb.forceDialogAuth = true;
 	
 	fb.addEventListener('login', function(e) {
 		Alloy.Globals.toggleAI(false);
@@ -182,25 +182,10 @@ function playMovie(e) {
 	}
 }
 
-function getCurrentCity() {
-  	if ( Ti.Geolocation.locationServicesEnabled ) {
-		Ti.Geolocation.purpose = 'Get Current City';
-	    Ti.Geolocation.getCurrentPosition(function( e ) {
-	    	if ( e.success ) {
-	    		vars.userCoordinates = [e.coords.longitude, e.coords.latitude];
-			} else {
-				Alloy.Globals.Common.showDialog({
-		            title:		'Warning',
-		            message:	'Sorry. We can\'t detect your current City.',
-		     	});
-			}
-			Alloy.Globals.toggleAI(false);
-	    });
-	} else {
-		Alloy.Globals.Common.showDialog({
-            title:		'Warning',
-            message:	'Location service on your device is turned off. Can\'t detect your current City.',
-     	});
-     	Alloy.Globals.toggleAI(false);
-	}
+function getCurrentLocation() {
+    Alloy.Globals.Common.getCurrentLocation ( function (coords) {
+        if (coords && coords.longitude && coords.latitude) {
+            vars.userCoordinates = [ coords.longitude, coords.latitude ];
+        }
+    });
 }

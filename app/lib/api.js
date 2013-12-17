@@ -32,17 +32,13 @@ exports.loadFeeds = function(excludedUserIDS, success, error) {
 	var filter = {
 		"id": 			{ "$nin": excludedUserIDS }, 				 
 		"first_name":	{ "$exists" : true },						// to make sure matchers have photo
-		// TODO: Comment out filter for now
-		// "$and": 		[ { "age": {"$gte": customFields.like_age_from} }, { "age": {"$lte": customFields.like_age_to} } ],
-        // status:		'active'									// TODO - Enable this filter after completing the admin dashboard to approve photo
+	    "$and": 		[ { "age": {"$gte": customFields.like_age_from} }, { "age": {"$lte": customFields.like_age_to} } ],
+        "status":		'approved'
    	};
 	   
-   	// TODO: Comment out filter for now
-   	/*
    	if ( customFields.like_gender != 'Anyone' ) {
 		filter['_gender'] = customFields.like_gender;    	
    	}
-   	*/
    	
    	// order by coordinates
    	if ( customFields.coordinates && customFields.coordinates.length ) {
@@ -192,23 +188,6 @@ exports.filterMatchers = function(start_time, excludedUserIDS, success, error) {
 		}
 	});
 };
-
-/*
-exports.findLastEvent = function ( success, error ) {
-    Cloud.Events.query({
-        where: {
-            user_id: Ti.App.currentUser.id,
-            status: 'new'
-        }
-    }, function (e) {
-        if (e.success) {
-            success && success( e.events );
-        } else {
-            error && error( (e.error && e.message) || JSON.stringify(e));
-        }
-    });
-};
-*/
 
 exports.updateEvent = function( data, callback ) {
     data.api_token = MC_API_TOKEN;
