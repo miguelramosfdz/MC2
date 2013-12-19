@@ -8,7 +8,7 @@ Ti.Geolocation.getCurrentPosition(locationCallback);
 //
 
 function locationCallback(e) {
-	Ti.API.log('Meetcute Background: Current Location ' + JSON.stringify(e.coords));
+	//Ti.API.log('Meetcute Background: Current Location ' + JSON.stringify(e.coords));
 	
 	var location = require('location');
 	if (location.checkLocation(e.coords, locationDestination)) {
@@ -23,10 +23,10 @@ function locationCallback(e) {
 function showMessage(status, message) {
 	Ti.API.log('Meetcute: ' + message);
 	Ti.App.Properties.setInt('locationStatus', status);
-	finishTracking();
+	_finishTracking();
 }
 
-function finishTracking() {
+function _finishTracking() {
   	var service = Ti.Android.currentService;
   	// var intent = service.getIntent();
   	service.stop();	

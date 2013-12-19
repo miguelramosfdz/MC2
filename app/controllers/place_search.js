@@ -22,7 +22,7 @@ function initYelp() {
 }
 
 function setYelpParams ( currentLocation ) {
-    $.yelp.setSearchParams(['ll=' + currentLocation[1] + ',' + currentLocation[0] , 'limit=20', 'sort=2']);
+    $.yelp.setSearchParams(['ll=' + currentLocation[1] + ',' + currentLocation[0] , 'limit=20', 'sort=2', 'radius_filter=' + 15 * 1609.344  ]);// radius_filter 15miles
     $.yelp.setHandlers({
         success: function(businesses) {
             var data = [];

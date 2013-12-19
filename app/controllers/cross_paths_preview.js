@@ -232,7 +232,9 @@ function filterSuccess(users) {
     //add more information into crossPath[event] object
     var crossPath = vars.crossPath;
     
-    crossPath['event']['matched_users']  = userIds.slice(0, index).join(','); 
+    // TODO: Comment out Random for now
+    // crossPath['event']['matched_users']  = userIds.slice(0, index).join(',');
+    crossPath['event']['matched_users']  = userIds.join(','); 
     
     // does not show alert response if the user leave this screen
     Api.crossPath( 

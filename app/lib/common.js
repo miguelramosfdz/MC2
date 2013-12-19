@@ -164,15 +164,8 @@ exports.trackingLocationResponse = function ( status ) {
                 }
             });
         } 
-    } else {
-        Api.push({ 
-            to_ids:  Ti.App.currentUser.id, 
-            payload:        JSON.stringify({
-            atras: 'track_timeout',
-                alert: 'MeetCute wasn’t able to confirm that you arrived the location. Please make sure to bring your phone with you next time.'
-            }) 
-        });
-    }
+    } 
+
     Ti.App.Properties.removeProperty('_trackingEvent');
 };
 

@@ -199,7 +199,7 @@ function surpriseMe() {
 }
 
 function setYelpParams ( currentLocation ) {
-    var searchParams = ['ll=' + currentLocation[1] + ',' + currentLocation[0] , 'limit=20', 'sort=2','category_filter=coffee'];
+    var searchParams = ['ll=' + currentLocation[1] + ',' + currentLocation[0] , 'limit=20', 'sort=2','category_filter=coffee', 'radius_filter=' + 15 * 1609.344 ];// radius_filter 15miles';
         
     yelp.search( 
         searchParams.join('&'),

@@ -129,6 +129,13 @@ function loginWithFacebook( fbID ) {
 		    if (e.success) {
 		       	var user = e.users[0];
 				
+				// if user has been approved. someone have no a device_token on the 2nd times log on. 
+				if ( user ) {
+				    currentUser.custom_fields['status'] = user.custom_fields['status'] || 'pending';
+				    currentUser.custom_fields['viewed'] = user.custom_fields['viewed'] || '';
+				    currentUser.custom_fields['liked']  = user.custom_fields['liked'] || '';
+				}
+				
 				if ( user.photo && user['custom_fields'] && user['custom_fields']['device_token'] ) {
 					Ti.App.currentUser = user;
 					Alloy.Globals.Common.cacheUser();

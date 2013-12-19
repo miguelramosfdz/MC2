@@ -5,10 +5,8 @@ var MATCH_DISTANCE = 0.05, // km
 	backgroundServices;
 
 exports.tracking = function(time, dest) {
-	if (checkPermission() === false) {
-		return;
-	}
-	
+    checkPermission();
+    
 	locationTime = time;
 	locationDestination = dest;
 	
@@ -91,6 +89,7 @@ function removeService(e) {
 	}
 	
 	var status = Ti.App.Properties.getInt('locationStatus');
+	//TODO: Test this: Maximum call stack size exceeded
 	if (status == 1 || status == 2) {
 		locationResult(status);		
 	}
@@ -98,15 +97,14 @@ function removeService(e) {
 }
 
 function locationCallback(e) {
+	var message = '';
+	
 	if (!e.success || e.error) {
-		var message = translateErrorCode(e.code);
-		message && showMessage( message );
-		return;
+		message = 'error_' + e.code;
+		Ti.API.log( 'Location tracking error: ' + message );
 	}
 
-	Ti.API.error('Meetcute: Current Location ' + JSON.stringify(e.coords));
-
-	if (checkLocation(e.coords, locationDestination)) {
+	if ( !message && checkLocation(e.coords, locationDestination)) {
 		locationResult(1);
 	} else if (new Date().getTime() - locationTime > locationTimeExpired) {
 		locationResult(2);
@@ -165,28 +163,6 @@ function locationResult(status) {
 }
 
 exports.locationResult = locationResult;
-
-function translateErrorCode(code) {
-	if (code == null) {
-		return null;
-	}
-	switch (code) {
-		case Ti.Geolocation.ERROR_LOCATION_UNKNOWN:
-			return "Location unknown";
-		case Ti.Geolocation.ERROR_DENIED:
-			return "Access denied";
-		case Ti.Geolocation.ERROR_NETWORK:
-			return "Network error";
-		case Ti.Geolocation.ERROR_HEADING_FAILURE:
-			return "Failure to detect heading";
-		case Ti.Geolocation.ERROR_REGION_MONITORING_DENIED:
-			return "Region monitoring access denied";
-		case Ti.Geolocation.ERROR_REGION_MONITORING_FAILURE:
-			return "Region monitoring access failure";
-		case Ti.Geolocation.ERROR_REGION_MONITORING_DELAYED:
-			return "Region monitoring setup delayed";
-	}
-}
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 /*  Latitude/longitude spherical geodesy formulae & scripts (c) Chris Veness 2002-2012            */
