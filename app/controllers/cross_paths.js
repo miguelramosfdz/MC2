@@ -3,7 +3,7 @@ var crossPath   = {},
     moment      = require('alloy/moment'),
     yelp        = require('yelp_api'),
     Api         = require('api'),
-    timer       = null;
+    vars        = {};
 
 exports.init = function() {
     // check this to make sure no more cross path be created on during a cross path is processing...
@@ -31,13 +31,13 @@ exports.reload = function(data) {
 };
 
 function checkCreateCrossFinished () {
-    timer = setInterval( function() {
+    vars.timer = setInterval( function() {
         var locked = Ti.App.Properties.getBool('lock_cross_path', false);
         
         // if creating the cross path is finished 
         if ( !locked ) {
-            clearInterval( timer );
-            timer = null;
+            clearInterval( vars.timer );
+            vars.timer = null;
             checkCrossPath();
         }
     }, 1000 );
@@ -72,8 +72,23 @@ function checkCrossPath () {
 // init page
 function loadPage () {
     loadNav();
+    getCurrentLocation();
     initTime();
     yelp.init();
+}
+
+function getCurrentLocation() {
+    var last_location = Ti.App.Properties.getObject('last_location', false);
+
+    if ( last_location && ( ( new Date().getTime() - last_location.timestamp ) < 5 * 60 * 1000 ) ) { //cache last location for 5mins
+        vars.currentLocation = [ last_location.longitude, last_location.latitude ];
+    } else {
+        Alloy.Globals.Common.getCurrentLocation ( function (coords) {
+            if ( coords.longitude && coords.latitude ) {
+                vars.currentLocation = [ coords.longitude, coords.latitude ];
+            }
+        });
+    }
 }
 
 function loadNav() {
@@ -95,7 +110,8 @@ function loadNav() {
 function showPlaceSearch() {
   	Alloy.Globals.PageManager.load({
   		url: 'place_search',
-  		isReset: false
+  		isReset: false,
+  		data: { location: vars.currentLocation }
   	});
 }
 
@@ -184,16 +200,10 @@ function surpriseMe() {
     } else {
         Alloy.Globals.toggleAI(true);
         //var currentLocation = [-122.417614, 37.781569];
-		var currentLocation = Ti.App.currentUser['custom_fields']['coordinates'] && Ti.App.currentUser['custom_fields']['coordinates'][0];
-	    
-	    if ( currentLocation ) {
+		var currentLocation = vars.currentLocation || ( Ti.App.currentUser['custom_fields']['coordinates'] && Ti.App.currentUser['custom_fields']['coordinates'][0] );
+        
+        if ( currentLocation && currentLocation.length == 2 ) {
             setYelpParams ( currentLocation );
-        } else {
-            Alloy.Globals.Common.getCurrentLocation ( function (coords) {
-                if (coords && coords.longitude && coords.latitude) {
-                    setYelpParams ( [ coords.longitude, coords.latitude ] );
-                }
-            });
         }
     }
 }

@@ -1,6 +1,7 @@
 var locationTime = Ti.App.Properties.getDouble('locationTime'),
 	locationTimeExpired = Ti.App.Properties.getInt('locationTimeExpired'),
-	locationDestination = Ti.App.Properties.getObject('locationDestination');
+	locationDestination = Ti.App.Properties.getObject('locationDestination'),
+	geo = require('geo');
 
 Ti.API.log('Meetcute: Background Services Start');
 Ti.Geolocation.getCurrentPosition(locationCallback);
@@ -8,22 +9,23 @@ Ti.Geolocation.getCurrentPosition(locationCallback);
 //
 
 function locationCallback(e) {
-	//Ti.API.log('Meetcute Background: Current Location ' + JSON.stringify(e.coords));
+	Ti.API.error('locationCallback - background');
 	
-	var location = require('location');
-	if (location.checkLocation(e.coords, locationDestination)) {
-		showMessage(1, 'Arrived');
-		location.locationResult(1);
+	if ( geo.inRange(e.coords, locationDestination) ) {
+		_locationResult(1, 'Arrived');
 	} else if (new Date().getTime() - locationTime > locationTimeExpired) {
-		showMessage(2, 'Timeout');
-		location.locationResult(2);
+		_locationResult(2, 'Timeout');
 	}
 }
 
-function showMessage(status, message) {
+function _locationResult(status, message) {
+	var Common = require('common');
+	
 	Ti.API.log('Meetcute: ' + message);
-	Ti.App.Properties.setInt('locationStatus', status);
+	Ti.App.Properties.setBool('locationResponseFromBackground', true);
 	_finishTracking();
+	
+	Common.trackingLocationResponse ( status );
 }
 
 function _finishTracking() {

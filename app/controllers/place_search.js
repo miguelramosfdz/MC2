@@ -1,3 +1,5 @@
+var args = arguments[0] || {};
+
 exports.init = function() {
   	initYelp();
   	
@@ -6,23 +8,14 @@ exports.init = function() {
 
 function initYelp() {
 	// Refer here for Yelp Search API - http://www.yelp.com/developers/documentation/v2/search_api
-	var currentLocation = Ti.App.currentUser['custom_fields']['coordinates'] && Ti.App.currentUser['custom_fields']['coordinates'][0];
+	var currentLocation = args.location || ( Ti.App.currentUser['custom_fields']['coordinates'] && Ti.App.currentUser['custom_fields']['coordinates'][0] );
 	
 	// var currentLocation = [-122.417614, 37.781569]; // only for test
-	
-	if ( currentLocation ) {
-	    setYelpParams ( currentLocation );
-	} else {
-	    Alloy.Globals.Common.getCurrentLocation ( function (coords) {
-            if (coords && coords.longitude && coords.latitude) {
-                setYelpParams ( [ coords.longitude, coords.latitude ] );
-            }
-        });
+	if ( !currentLocation || currentLocation.length != 2 ) {
+	    return;
 	}
-}
-
-function setYelpParams ( currentLocation ) {
-    $.yelp.setSearchParams(['ll=' + currentLocation[1] + ',' + currentLocation[0] , 'limit=20', 'sort=2', 'radius_filter=' + 15 * 1609.344  ]);// radius_filter 15miles
+	
+	$.yelp.setSearchParams(['ll=' + currentLocation[1] + ',' + currentLocation[0] , 'limit=20', 'sort=2', 'radius_filter=' + 15 * 1609.344  ]);// radius_filter 15miles
     $.yelp.setHandlers({
         success: function(businesses) {
             var data = [];

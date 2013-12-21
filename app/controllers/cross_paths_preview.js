@@ -133,14 +133,31 @@ function updateTime() {
         } else {
             // Create Place & Event on the server
         	createCrossPath();
-        	vars.createOnExit = false;
-
-            clearInterval( vars.timer );
-            vars.timer = null;
-            
-            loadWingman();
+        	createCrossPathFinished();
         }
     }, 1000 );
+    
+    if ( OS_IOS ) {
+        Ti.App.addEventListener('pause', submitOnPause);
+    }
+}
+
+function submitOnPause() {
+    createCrossPath(true);
+    createCrossPathFinished();
+};
+
+function createCrossPathFinished () {
+    if ( OS_IOS ) {
+    	Ti.App.removeEventListener('pause', submitOnPause);
+    }
+
+    vars.createOnExit = false;
+
+    clearInterval( vars.timer );
+    vars.timer = null;
+
+    loadWingman();    
 }
 
 function isActivePage() {

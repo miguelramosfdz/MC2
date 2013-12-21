@@ -35,8 +35,17 @@ function receivePush(e) {
 		    
     switch( data.atras ) {
 		case 'reminder':
-            Alloy.Globals.Common.startTrackingLocation( data.eventId, data.latitude, data.longitude );
+            if ( !Ti.App.currentUser || !Ti.App.currentUser.id ) {
+		        return;
+		    }
+		    
+		    Ti.App.Properties.setObject('_trackingEvent', { eventId: data.eventId } );
+
+		    var location = require('location');
+			    location.tracking(new Date().getTime(), { latitude: data.latitude, longitude: data.longitude } ); // test android device arrived
+			    // location.tracking(new Date().getTime(), { latitude: 37.78583526611328, longitude: -122.40641784667969 }); // test ios simulator arrived
             break;
+            
 		case 'cross_path':
 			if (Alloy.Globals.loggedIn) {
         		Alloy.Globals.PageManager.load({

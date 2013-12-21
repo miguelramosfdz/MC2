@@ -121,20 +121,6 @@ exports.reverseToBusyString = function  ( time ) {
     return result;
 };
 
-exports.startTrackingLocation = function (eventId, lat, lon) {
-    if ( !Ti.App.currentUser || !Ti.App.currentUser.id ) {
-        return;
-    }
-    Ti.API.error ('device starting tracking...' + lat + '...' + lon );
-
-    var location = require('location');
-        
-    Ti.App.Properties.setObject('_trackingEvent', { eventId: eventId } );
-        
-    location.tracking(new Date().getTime(), { latitude: lat || 0, longitude: lon || 0 } ); // test android device arrived
-    // location.tracking(new Date().getTime(), { latitude: 37.78583526611328, longitude: -122.40641784667969 }); // test ios simulator arrived
-};
-
 exports.trackingLocationResponse = function ( status ) {
     if ( status == 1 ) {// arrived 
     	var _trackingEvent = Ti.App.Properties.getObject('_trackingEvent', false);
@@ -221,26 +207,51 @@ exports.answerFeedback = function ( data ) {
 };
 
 exports.getCurrentLocation = function ( callback ) {
-    
-    if ( Ti.Geolocation.locationServicesEnabled ) {
-        Alloy.Globals.toggleAI(true);
+    if ( !checkGeoPermission() ) {
+        Ti.Geolocation.accuracy          = Ti.Geolocation.ACCURACY_HIGH;
+        Ti.Geolocation.preferredProvider = "gps";
         
-        Ti.Geolocation.purpose = 'Get Current Location';
-        Ti.Geolocation.getCurrentPosition(function( e ) {
-            if ( e.success && e.coords ) {
-                callback && callback ( e.coords );
-            } else {
-                Alloy.Globals.Common.showDialog({
-                    title:      'Warning',
-                    message:    'Sorry. We can\'t detect your current Location.',
-                });
+        if ( OS_IOS ) {
+  			Ti.Geolocation.distanceFilter = 10;
+			Ti.Geolocation.purpose = "Get user location";
+  		}
+        
+        var _locationCallback = function (e) {
+            if (!e.success || e.error) {
+                Ti.API.log( 'Location tracking error: ' + JSON.stringify(e.error) );
+                return;
             }
-            Alloy.Globals.toggleAI(false);
-        });
-    } else {
-        Alloy.Globals.Common.showDialog({
-            title:      'Warning',
-            message:    'Location service on your device is turned off. Can\'t detect your current Location.',
-        });
+            
+            if ( e.coords ) {
+                Ti.App.Properties.setObject('last_location', { timestamp: e.coords.timestamp, latitude: e.coords.latitude, longitude: e.coords.longitude });
+                callback && callback ( e.coords );
+            }
+            Ti.Geolocation.removeEventListener('location', _locationCallback);
+        };
+        Ti.Geolocation.addEventListener('location', _locationCallback);
     }
 };
+
+function checkGeoPermission() {
+    var error = '';
+    
+    if (Ti.Geolocation.locationServicesEnabled === false) {
+        error = 'Please turn on Location services';
+    }
+
+    if (OS_IOS) {
+        var authorization = Ti.Geolocation.locationServicesAuthorization;
+       
+        if (authorization == Ti.Geolocation.AUTHORIZATION_DENIED) {
+            error = 'You have disallowed Meetcute from running geolocation services.';
+        } else if (authorization == Ti.Geolocation.AUTHORIZATION_RESTRICTED) {
+            error = 'Your system has disallowed Meetcute from running geolocation services.';
+        }
+    }
+    
+    if ( error ) {
+        showDialog({ title:'Location Services', message: error });
+    }
+    
+    return error;
+}

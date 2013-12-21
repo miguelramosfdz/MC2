@@ -130,7 +130,7 @@ function loginWithFacebook( fbID ) {
 		       	var user = e.users[0];
 				
 				// if user has been approved. someone have no a device_token on the 2nd times log on. 
-				if ( user ) {
+				if ( user && user.custom_fields ) {
 				    currentUser.custom_fields['status'] = user.custom_fields['status'] || 'pending';
 				    currentUser.custom_fields['viewed'] = user.custom_fields['viewed'] || '';
 				    currentUser.custom_fields['liked']  = user.custom_fields['liked'] || '';
