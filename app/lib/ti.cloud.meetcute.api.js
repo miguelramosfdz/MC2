@@ -65,6 +65,10 @@ exports.user_filter_matchers = function (data, cb) {
    InvokeService("/api/filter_matchers", "POST", data, cb);
 };
 
+exports.user_email_photo = function (data, cb) {
+   InvokeService("/api/email_photo", "POST", data, cb);
+};
+
 exports.photos_index = function (data, cb) {
    InvokeService("/photos", "GET", data, cb);
 };

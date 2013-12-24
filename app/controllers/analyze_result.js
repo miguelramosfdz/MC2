@@ -1,6 +1,7 @@
-var vars = {},
-	Cloud = require('ti.cloud'),
-	currentUser = arguments[0] || {};
+var vars    = {},
+	Cloud   = require('ti.cloud'),
+	args    = arguments[0] || {};
+	currentUser = args.currentUser || {};
 
 Cloud.debug = true;
 	
@@ -143,6 +144,19 @@ function updateUser ( e ) {
 				Ti.App.currentUser = e.users[0];
 				
 				Alloy.Globals.Common.cacheUser();
+				
+				// send photo event in the first time
+				if ( args.send_email) {
+				    var Api = require('api');
+
+				    Api.emailPhoto (
+				        {
+				            //TODO: update content
+				            content: 'There\'re new photos need your approval: ' + e.users[0].id
+				        }
+				    );
+				}
+				
 				Alloy.Globals.WinManager.load({
 					url: 'main_window'
 				});

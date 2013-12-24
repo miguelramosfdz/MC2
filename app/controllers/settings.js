@@ -4,16 +4,7 @@ var Cloud = require('ti.cloud');
 exports.init = function() {
   	loadNav();
   	Alloy.Globals.toggleAI(false);
-  	
-  	test();
 };
-
-function test() {
-	Ti.App.Properties.setObject('_trackingEvent', { eventId: '52b3fe975f54be0b820079f2' } );
-		
-    var location = require('location');
-	    location.tracking(new Date().getTime(), { latitude: 37.78583526611328, longitude: -122.40641784667969 }); // test ios simulator arrived
-}
 
 function loadNav() {
   	var btnMenu = Alloy.createController('elements/button', {

@@ -24,7 +24,7 @@ exports.reload = function(data) {
 	}
 	
 	if ( data.from == 'place_search' && data.place ) {
-		$.lblPlace.text = data.place.name;
+		setCrossPathsValue($.lblPlace, data.place.name);
 		$.btnIWillBeThere.show();
 		crossPath['place'] = data.place;
 	}
@@ -139,7 +139,7 @@ function showTimePicker(e) {
 }
 
 function setTime(time) {
-	$.lblTime.text = moment(time).format('h:mmA');
+	setCrossPathsValue($.lblTime, moment(time).format('h:mmA'));
   	$.timePicker.hide();
   	$.lblTime.value = moment(time).format();
 }
@@ -188,8 +188,7 @@ function validateData () {
 
 function initTime () {
     var time = moment().add('minutes', 36);
-    
-    $.lblTime.text = time.format('h:mmA');
+    setCrossPathsValue($.lblTime, time.format('h:mmA'));
     $.lblTime.value = time.format();
 }
 
@@ -247,7 +246,7 @@ function generateSurprisePlace () {
 	        business = businesses[_index];
 	    
 	    if ( business ) {
-	        $.lblPlace.text = business.name;
+	        setCrossPathsValue($.lblPlace, business.name);
 	        
 	        crossPath['place'] = {
 	            yelpId:     business.id,
@@ -289,7 +288,7 @@ function generateSurpriseTime( period ) {
     _time.hour(_HH);
     _time.minute(_mm); 
     
-    $.lblTime.text = _time.format('h:mmA');
+    setCrossPathsValue($.lblTime, _time.format('h:mmA'));
     $.lblTime.value = _time.format();
 }
 
@@ -323,5 +322,23 @@ function checkBusyTime(range) {
 	
 	if (range[1] < range[0]) {
 		range[1] = range[0];
+	}
+}
+
+function setCrossPathsValue(label, text) {
+	if (OS_IOS) {
+		label.attributedString = Ti.UI.iOS.createAttributedString({
+		    text: text,
+		    attributes: [
+		        // Underlines text
+		        {
+		            type: Titanium.UI.iOS.ATTRIBUTE_UNDERLINES_STYLE,
+		            value: Titanium.UI.iOS.ATTRIBUTE_UNDERLINE_STYLE_SINGLE,
+		            range: [0, text.length]
+		        }
+		    ]
+		});
+	} else {
+		label.text = text;
 	}
 }

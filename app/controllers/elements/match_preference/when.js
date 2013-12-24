@@ -9,12 +9,30 @@ exports.init = function(fnc, top) {
 exports.set = function(params) {
 	$.lbBusyText.text      = params.busy_weekdays['prefix'] + ':';
 	$.lbBusyValue.value    = params.busy_weekdays['value'];
-	$.lbBusyValue.text     = params.busy_weekdays['time'];
+	setBusyTime($.lbBusyValue, params.busy_weekdays['time']);
 	
 	$.lbWeekendsText.text  = params.busy_weekends['prefix'] + ':';
 	$.lbWeekendsValue.value = params.busy_weekends['value'];
-	$.lbWeekendsValue.text = params.busy_weekends['time'];
+	setBusyTime($.lbWeekendsValue, params.busy_weekends['time']);
 };
+
+function setBusyTime(label, text) {
+	if (OS_IOS) {
+		label.attributedString = Ti.UI.iOS.createAttributedString({
+		    text: text,
+		    attributes: [
+		        // Underlines text
+		        {
+		            type: Titanium.UI.iOS.ATTRIBUTE_UNDERLINES_STYLE,
+		            value: Titanium.UI.iOS.ATTRIBUTE_UNDERLINE_STYLE_SINGLE,
+		            range: [0, text.length]
+		        }
+		    ]
+		});
+	} else {
+		label.text = text;
+	}
+}
 
 exports.get = function() {
 	return {
@@ -44,7 +62,7 @@ exports.update = function(time) {
 		arrTime = time.toTimeString().split(':'),
 		value = arrTime[0] + arrTime[1];
 		
-    target.text = moment(time).format('h:mmA');
+    setBusyTime(target, moment(time).format('h:mmA'));
     target.value = value;
     target = null;
 };

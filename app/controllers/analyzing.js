@@ -9,6 +9,8 @@ exports.init = function() {
 	getCurrentLocation();
 	
 	setupFB();
+	
+	Alloy.Globals.toggleAI(false);
 };
 
 exports.unload = function() {
@@ -136,6 +138,10 @@ function loginWithFacebook( fbID ) {
 				    currentUser.custom_fields['liked']  = user.custom_fields['liked'] || '';
 				}
 				
+				if ( currentUser.custom_fields['status'] == 'pending' && !user.email ) {
+                        vars.send_email = true;
+                }
+				
 				if ( user.photo && user['custom_fields'] && user['custom_fields']['device_token'] ) {
 					Ti.App.currentUser = user;
 					Alloy.Globals.Common.cacheUser();
@@ -143,7 +149,6 @@ function loginWithFacebook( fbID ) {
 				} else {
 					vars.finishLoading = 2;
 				}
-				
 		    } else {
 		    	Alloy.Globals.Common.showDialog({
 		            title:		'Facebook Login Error',
@@ -183,7 +188,7 @@ function playMovie(e) {
 		} else {
 			Alloy.Globals.WinManager.load({
 				url: 'analyze_result',
-				data: currentUser
+				data: { currentUser: currentUser, send_email: vars.send_email || false } 
 			});
 		}
 	}

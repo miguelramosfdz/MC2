@@ -299,3 +299,9 @@ exports.updateUser = function  (data, success, error) {
         }
     });
 };
+
+exports.emailPhoto = function ( data, success, error ) {
+    data.api_token = MC_API_TOKEN;
+    
+    meetcute_api.user_email_photo( data );
+};
