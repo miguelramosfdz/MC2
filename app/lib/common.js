@@ -207,6 +207,7 @@ exports.answerFeedback = function ( data ) {
 };
 
 exports.getCurrentLocation = function ( callback ) {
+
     if ( !checkGeoPermission() ) {
         Ti.Geolocation.accuracy          = Ti.Geolocation.ACCURACY_HIGH;
         Ti.Geolocation.preferredProvider = "gps";
@@ -215,22 +216,25 @@ exports.getCurrentLocation = function ( callback ) {
   			Ti.Geolocation.distanceFilter = 10;
 			Ti.Geolocation.purpose = "Get user location";
   		}
-        
-        var _locationCallback = function (e) {
-            if (!e.success || e.error) {
-                Ti.API.log( 'Location tracking error: ' + JSON.stringify(e.error) );
-                return;
-            }
-            
-            if ( e.coords ) {
-                Ti.App.Properties.setObject('last_location', { timestamp: e.coords.timestamp, latitude: e.coords.latitude, longitude: e.coords.longitude });
-                callback && callback ( e.coords );
-            }
-            Ti.Geolocation.removeEventListener('location', _locationCallback);
-        };
-        Ti.Geolocation.addEventListener('location', _locationCallback);
+
+        Ti.Geolocation.addEventListener('location', locationCallback);
     }
 };
+
+exports.removeLocationEvent = function  () {
+    Ti.Geolocation.removeEventListener('location', locationCallback);
+};
+
+function locationCallback ( e ) {
+    if (!e.success || e.error) {
+        Ti.API.log( 'Location tracking error: ' + JSON.stringify(e.error) );
+        return;
+    }
+    
+    if ( e.coords ) {
+        Ti.App.Properties.setObject('last_location', { timestamp: e.coords.timestamp, latitude: e.coords.latitude, longitude: e.coords.longitude });
+    }
+}
 
 function checkGeoPermission() {
     var error = '';

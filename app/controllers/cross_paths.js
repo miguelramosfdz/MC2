@@ -17,6 +17,7 @@ exports.init = function() {
 };
 
 exports.reload = function(data) {
+    Alloy.Globals.Common.getCurrentLocation();
     initTime();
     
 	if ( !data ) {
@@ -28,6 +29,10 @@ exports.reload = function(data) {
 		$.btnIWillBeThere.show();
 		crossPath['place'] = data.place;
 	}
+};
+
+exports.cleanup = function() {
+    Alloy.Globals.Common.removeLocationEvent();
 };
 
 function checkCreateCrossFinished () {
@@ -72,23 +77,9 @@ function checkCrossPath () {
 // init page
 function loadPage () {
     loadNav();
-    getCurrentLocation();
     initTime();
     yelp.init();
-}
-
-function getCurrentLocation() {
-    var last_location = Ti.App.Properties.getObject('last_location', false);
-
-    if ( last_location && ( ( new Date().getTime() - last_location.timestamp ) < 5 * 60 * 1000 ) ) { //cache last location for 5mins
-        vars.currentLocation = [ last_location.longitude, last_location.latitude ];
-    } else {
-        Alloy.Globals.Common.getCurrentLocation ( function (coords) {
-            if ( coords.longitude && coords.latitude ) {
-                vars.currentLocation = [ coords.longitude, coords.latitude ];
-            }
-        });
-    }
+    Alloy.Globals.Common.getCurrentLocation();
 }
 
 function loadNav() {
@@ -108,10 +99,12 @@ function loadNav() {
 // PLACE SEARCH
 
 function showPlaceSearch() {
+    var last_location = Ti.App.Properties.getObject('last_location', false);
+    
   	Alloy.Globals.PageManager.load({
   		url: 'place_search',
   		isReset: false,
-  		data: { location: vars.currentLocation }
+  		data: { location: last_location ? [ last_location.longitude, last_location.latitude ] : false }
   	});
 }
 
@@ -193,22 +186,23 @@ function initTime () {
 }
 
 function surpriseMe() {
+    var last_location = Ti.App.Properties.getObject('last_location', false);
+
     // get data from cache
-    if ( businesses.length > 0 ) {
+    if ( businesses.length > 0 && vars.poll_businesses && ( ( new Date().getTime() - vars.poll_businesses ) < 5 * 60 * 1000 ) ) { // cache businesses for 5mins
         generateSurprisePlace ();
     } else {
         Alloy.Globals.toggleAI(true);
-        //var currentLocation = [-122.417614, 37.781569];
-		var currentLocation = vars.currentLocation || ( Ti.App.currentUser['custom_fields']['coordinates'] && Ti.App.currentUser['custom_fields']['coordinates'][0] );
+        //var last_location = { longitude: -122.417614, latitude: 37.781569 };
         
-        if ( currentLocation && currentLocation.length == 2 ) {
-            setYelpParams ( currentLocation );
+        if ( last_location ) {
+            setYelpParams ( last_location.latitude, last_location.longitude );
         }
     }
 }
 
-function setYelpParams ( currentLocation ) {
-    var searchParams = ['ll=' + currentLocation[1] + ',' + currentLocation[0] , 'limit=20', 'sort=2','category_filter=coffee', 'radius_filter=' + 15 * 1609.344 ];// radius_filter 15miles';
+function setYelpParams ( latitude, longitude ) {
+    var searchParams = ['ll=' + latitude + ',' + longitude, 'limit=20', 'sort=2','category_filter=coffee', 'radius_filter=' + 15 * 1609.344 ];// radius_filter 15miles';
         
     yelp.search( 
         searchParams.join('&'),
@@ -218,6 +212,8 @@ function setYelpParams ( currentLocation ) {
                 _businesses = _.where( _businesses, { is_closed: false } );
 
                 businesses = _businesses;
+                vars.poll_businesses = new Date().getTime();
+                
                 generateSurprisePlace();
                 
             } catch (e) {

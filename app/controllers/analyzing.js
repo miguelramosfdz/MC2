@@ -6,7 +6,7 @@ var Cloud = require('ti.cloud'),
 Cloud.debug = true;
 
 exports.init = function() {
-	getCurrentLocation();
+	Alloy.Globals.Common.getCurrentLocation();
 	
 	setupFB();
 	
@@ -24,6 +24,7 @@ exports.unload = function() {
 		}
 		vars = null;
 	}
+	Alloy.Globals.Common.removeLocationEvent();
 };
 
 function setupFB() {
@@ -113,8 +114,11 @@ function fbProcessData ( fbInfo ) {
 	if ( fbInfo.birthday ) {
 		currentUser['custom_fields']['age'] = new Date().getFullYear() - parseInt( fbInfo.birthday.split('/')[2], 10);
 	}
+	
+	vars.userCoordinates = Ti.App.Properties.getObject('last_location', false);
+	
 	if ( vars.userCoordinates ) {
-		currentUser['custom_fields']['coordinates'] = vars.userCoordinates;
+		currentUser['custom_fields']['coordinates'] = [ vars.userCoordinates.longitude, vars.userCoordinates.latitude ];;
 	}
 	
 	loginWithFacebook ( fbInfo.id );
@@ -192,12 +196,4 @@ function playMovie(e) {
 			});
 		}
 	}
-}
-
-function getCurrentLocation() {
-    Alloy.Globals.Common.getCurrentLocation ( function (coords) {
-        if (coords && coords.longitude && coords.latitude) {
-            vars.userCoordinates = [ coords.longitude, coords.latitude ];
-        }
-    });
 }
