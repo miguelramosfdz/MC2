@@ -32,12 +32,7 @@ vars.createOnExit = vars.mode != 'old';
 
 exports.init = function() {
   	loadNav();
-  	if ( vars.mode == 'review' && vars.event_id ) {
-  	    loadReview( vars.event_id );
-  	} else {
-  	    loadCrossPath();
-  	}
-  	
+  	loadCrossPath();
   	Alloy.Globals.toggleAI(false);
 };
 
@@ -105,8 +100,6 @@ function loadCrossPath() {
 
     switch ( vars.mode ) {
         case 'review':
-            $.lblNotification.parent.remove( $.lblNotification );
-            break;
         case 'old':
             loadWingman();
             break;
@@ -169,7 +162,7 @@ function isActivePage() {
 
 function createCrossPath (noCallback) {
     // begin create cross path, set this true to unable to create more cross path if user unload page and click on Cross Path menu
-    Ti.App.Properties.setBool('lock_cross_path', true);
+    Ti.App.Properties.setInt('lock_cross_path', new Date().getTime());
     
     if ( !noCallback ) {
         Alloy.Globals.toggleAI(true);
@@ -273,8 +266,8 @@ function filterSuccess(users) {
 	    	    
 	    	    Alloy.Globals.toggleAI(false);
     	    }
-    	    // create cross path finished, set this false to unlock
-    	    Ti.App.Properties.setBool('lock_cross_path', false);
+    	    // create cross path finished, remove this to unlock
+    	    Ti.App.Properties.removeProperty('lock_cross_path');
     	}
     );
 }
@@ -288,20 +281,10 @@ function goBack(e) {
 	dialog.show();
 	dialog.addEventListener('click', function(e) {
 	  	if (e.index == 1) {
-	  	    // vars.crossPath = null; // null when cancel & back to cross back
 	  	    vars.createOnExit = false;
 	  	    
 	  	    if (vars.mode == 'new') {
 	  			Alloy.Globals.PageManager.loadPrevious();
-	  	    } else if (vars.mode == 'review') {
-                //the matcher deny this event
-                
-                Alloy.Globals.toggleAI(true);
-	  	        Api.getEventById({
-                    event_id: vars.crossPath.event.id
-                },
-                updateEvent
-                );
 	  	    }
 	  	}
 	});
@@ -311,72 +294,4 @@ function showWingmanMessage(e) {
 	//TODO: code this
   	var messages = ['xxx', 'yyy', 'zzz'];
   	alert( messages[ new Date().getTime() % 3 ] );
-}
-
-function updateEvent ( res ) {
-    if ( res && res.length ) {
-        var event          = res[0],
-            disagree_users = event.disagree_users;
-            disagree_users = ( disagree_users ) ? disagree_users.split(',') : [];
-            
-        if ( disagree_users.indexOf ( Ti.App.currentUser.id ) == -1 ) {
-            disagree_users.push ( Ti.App.currentUser.id );
-        }
-        
-        var event_data = { 
-            event_id : event.id,
-            custom_fields: {
-                disagree_users: disagree_users.join(',')  
-            }
-        };
-
-        Api.updateEvent ({ 
-            data : JSON.stringify( event_data ) 
-        },
-        function(res) {
-            Alloy.Globals.toggleAI(false);
-            if ( res.success ) {
-                Alloy.Globals.PageManager.load({
-                    url:        'cross_paths',
-                    isReset:    true
-                });
-            } else {
-                Alloy.Globals.Common.showDialog({
-                    title:      'Error',
-                    message:    res.error
-                });
-            }
-        });
-    }
-}
-
-function loadReview ( event_id ) {
-    Alloy.Globals.toggleAI(true);
-    
-    Api.getEventById ({ 
-        event_id: event_id
-    },
-    function (res) {
-        if ( res && res.length ) {
-            var event = res[0];
-            
-            vars.crossPath = {
-                event: {
-                    id:         event.id,
-                    start_time: event.start_time,
-                },
-                place: {
-                    name:     event.place['name'],
-                    address:  [event.place['address']],
-                }
-             };
-             loadCrossPath();
-        } else {
-            Alloy.Globals.Common.showDialog({
-                title:      'Error',
-                message:    'Sorry, Cross Paths is not found.'
-            });
-        }
-        Alloy.Globals.toggleAI(false);
-    });
 }

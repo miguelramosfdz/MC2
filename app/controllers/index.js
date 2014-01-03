@@ -1,14 +1,14 @@
 init();
 
 function init() {
-	var WinPlugins = require('window_plugins');
+	var plugins = require('managers/plugins');
 	
-	Alloy.Globals.toggleAI = WinPlugins.toggleAI;
+	Alloy.Globals.toggleAI = plugins.toggleAI;
 	
 	// initialize window manager
 	
-	var oWindowManager = require('window_manager'),
-		winManager = new oWindowManager( WinPlugins.onChange );
+	var oWindowManager = require('managers/window'),
+		winManager = new oWindowManager( plugins.windowChanged );
 	
 	Alloy.Globals.WinManager = winManager;
 	
@@ -30,8 +30,4 @@ function init() {
 			}); 		
 		}
 	);
-	
-	// Push Notification
-	var pushObj = ( OS_ANDROID ? require('and_push') : require('ios_push') );
-		pushObj.init();
 }

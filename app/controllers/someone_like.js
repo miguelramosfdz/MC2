@@ -108,6 +108,7 @@ function getFeeds() {
 }
 
 function getFeedError() {
+	Alloy.Globals.toggleAI(false);
 }
 
 function loadFeeds(users) {

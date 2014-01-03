@@ -5,7 +5,7 @@ exports.init = function() {
 	if ( '' == Ti.App.Properties.getString('deviceToken', '') ) {
 		retrieveDeviceToken();
 	} else {
-		CloudPush.enabled = true;
+		enableCloudPush();
 	}
 
 	registerCallbacks();
@@ -22,12 +22,17 @@ function retrieveDeviceToken() {
 // Enable push notifications for this device
 // Save the device token for subsequent API calls
 function deviceTokenSuccess(e) {
-	CloudPush.enabled = true;
+	enableCloudPush();
 	Ti.App.Properties.setString('deviceToken', e.deviceToken);
 }
 
 function deviceTokenError(e) {
 	alert('Failed to register for push notifications! ' + e.error);
+}
+
+function enableCloudPush () {
+    CloudPush.enabled = true; // Whether or not this device will receive push notifications.
+    CloudPush.showTrayNotificationsWhenFocused = true;// Whether or not to show tray notifications when your application is in the foreground.
 }
 
 function registerCallbacks() {
@@ -52,13 +57,13 @@ function registerCallbacks() {
 		        case "cross_path":
 		             if (Alloy.Globals.loggedIn) {
 		        		Alloy.Globals.PageManager.load({
-							url:        'cross_paths_preview',
+							url:        'cross_paths',
 			                isReset:    true,
 			                data:       { mode: 'review', event_id: data.event_id }
 						}); 
 		        	} else {
 			        	Ti.App.Properties.setObject('appRedirect', {
-							url:        'cross_paths_preview',
+							url:        'cross_paths',
 			                isReset:    true,
 			                data:       { mode: 'review', event_id: data.event_id }
 						});

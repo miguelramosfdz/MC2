@@ -5,14 +5,20 @@ var crossPath   = {},
     Api         = require('api'),
     vars        = {};
 
+vars.args = arguments[0] || {};
+
 exports.init = function() {
     // check this to make sure no more cross path be created on during a cross path is processing...
-    var locked = Ti.App.Properties.getBool('lock_cross_path', false);
-    
+    var locked = Ti.App.Properties.getInt('lock_cross_path', 0);
+
     if ( locked ) {
         checkCreateCrossFinished();
     } else {
-        checkCrossPath();
+        if ( vars.args.mode && vars.args.mode == 'review' && vars.args.event_id ) {
+            loadReview(vars.args.event_id);
+        } else {
+            checkCrossPath();
+        }
     }
 };
 
@@ -28,6 +34,8 @@ exports.reload = function(data) {
 		setCrossPathsValue($.lblPlace, data.place.name);
 		$.btnIWillBeThere.show();
 		crossPath['place'] = data.place;
+		vars.disagree = true; // Disagree matched Cross path when the Matcher change place or time
+		vars.mapUrl = crossPath['place'].website || data.place.name;
 	}
 };
 
@@ -37,10 +45,11 @@ exports.cleanup = function() {
 
 function checkCreateCrossFinished () {
     vars.timer = setInterval( function() {
-        var locked = Ti.App.Properties.getBool('lock_cross_path', false);
-        
+        var locked = Ti.App.Properties.getInt('lock_cross_path', 0),
+            timeout = new Date().getTime() - locked;
+            
         // if creating the cross path is finished 
-        if ( !locked ) {
+        if ( timeout > 20 * 1000 ) {// set Timeout to unlock is 20secs
             clearInterval( vars.timer );
             vars.timer = null;
             checkCrossPath();
@@ -56,13 +65,19 @@ function checkCrossPath () {
         function ( res ) {
             Alloy.Globals.toggleAI(false);
             if ( res.has_active_cross_path ) {
-                var mode = ( res.type == 'initor' ) ? 'old' : 'review';
-
-                Alloy.Globals.PageManager.load({
-                    url:        'cross_paths_preview',
-                    isReset:    true,
-                    data:       { mode: mode, crossPath: res.crossPath }
-                });
+                if ( res.type == 'matcher' ) {
+                    vars.args.mode = 'review';
+                    vars.args.event_id = res.crossPath.event.event_id;
+                    loadReview( vars.args.event_id );
+                } else {
+                    var mode = ( res.type == 'initor' ) ? 'old' : 'review';
+                    
+                    Alloy.Globals.PageManager.load({
+                        url:        'cross_paths_preview',
+                        isReset:    true,
+                        data:       { mode: mode, crossPath: res.crossPath }
+                    });
+                }
             } else {
                 loadPage();
             }
@@ -109,20 +124,20 @@ function showPlaceSearch() {
 }
 
 function showMap() {
-	if (crossPath['place']) {
-		Alloy.Globals.PageManager.load({
-	  		url: 'yelp',
-	  		isReset: false,
-	  		data: {
-	  			url: crossPath['place'].website
-	  		}
-	  	});
-	} else {
-		Alloy.Globals.PageManager.load({
-	  		url: 'yelp',
-	  		isReset: false
-	  	});
-	}
+    if ( vars.mapUrl ) {
+        Alloy.Globals.PageManager.load({
+            url: 'yelp',
+            isReset: false,
+            data: {
+                url: vars.mapUrl
+            }
+        });
+    } else {
+    	Alloy.Globals.Common.showDialog({
+             title:      'Error',
+             message:    'Can\'t find URL.'
+        });
+    }
 }
 
 // TIME PICKER
@@ -135,26 +150,43 @@ function setTime(time) {
 	setCrossPathsValue($.lblTime, moment(time).format('h:mmA'));
   	$.timePicker.hide();
   	$.lblTime.value = moment(time).format();
+  	vars.disagree = true; // Disagree matched Cross path when the Matcher change place or time
 }
 
 function clickOnIWillBeThere() {
-    if ( !validateData() ) {
-    	return;
+    if ( vars.args.mode == 'review' && vars.args.event_id && !vars.disagree ) {
+        Alloy.Globals.toggleAI(true);
+        Api.getEventById({
+            event_id: vars.args.event_id
+        },
+        acceptEvent
+        );
+    } else {
+        // deny matched event
+        if ( vars.args.mode == 'review' && vars.args.event_id && vars.disagree ) { 
+            Api.getEventById({
+                event_id: vars.args.event_id
+            },
+            denyEvent
+            );
+        }
+        
+        if ( !validateData() ) {
+        	return;
+        }
+        
+        crossPath['event'] =  {
+            user_id:    Ti.App.currentUser.id,
+            name:       $.lblPlace.text + ' at ' + $.lblTime.text,
+            start_time: $.lblTime.value
+        };
+        
+        Alloy.Globals.PageManager.load({
+            url: 		'cross_paths_preview',
+            isReset: 	false,
+            data: 		{ mode: 'new', crossPath: crossPath }
+        });
     }
-    
-    Alloy.Globals.toggleAI(true);
-    
-    crossPath['event'] =  {
-        user_id:    Ti.App.currentUser.id,
-        name:       $.lblPlace.text + ' at ' + $.lblTime.text,
-        start_time: $.lblTime.value
-    };
-    
-    Alloy.Globals.PageManager.load({
-        url: 		'cross_paths_preview',
-        isReset: 	false,
-        data: 		{ mode: 'new', crossPath: crossPath }
-    });
 }
 
 function validateData () {
@@ -187,7 +219,8 @@ function initTime () {
 
 function surpriseMe() {
     var last_location = Ti.App.Properties.getObject('last_location', false);
-
+    
+    vars.disagree = true; // Disagree matched Cross path when the Matcher change place or time
     // get data from cache
     if ( businesses.length > 0 && vars.poll_businesses && ( ( new Date().getTime() - vars.poll_businesses ) < 5 * 60 * 1000 ) ) { // cache businesses for 5mins
         generateSurprisePlace ();
@@ -256,6 +289,7 @@ function generateSurprisePlace () {
 	            display_address:   business.location.display_address,
 	            city:       business.location.city
 	        };
+	        vars.mapUrl = business.url || business.name;
 	        
 	        generateSurpriseTime( 5 );// each 5 minutes once
 	        $.btnIWillBeThere.show();
@@ -322,6 +356,7 @@ function checkBusyTime(range) {
 }
 
 function setCrossPathsValue(label, text) {
+	label.text = text;
 	if (OS_IOS) {
 		label.attributedString = Ti.UI.iOS.createAttributedString({
 		    text: text,
@@ -334,7 +369,131 @@ function setCrossPathsValue(label, text) {
 		        }
 		    ]
 		});
-	} else {
-		label.text = text;
 	}
+}
+
+function loadReview ( event_id ) {
+    Alloy.Globals.toggleAI(true);
+    
+    Api.getEventById ({
+        event_id: event_id
+    },
+    function (res) {
+        if ( res && res.length ) {
+            var event = res[0];
+
+            loadCrossPath( event );
+        } else {
+            Alloy.Globals.Common.showDialog({
+                title:      'Error',
+                message:    'Sorry, Cross Paths is not found.'
+            });
+        }
+        Alloy.Globals.toggleAI(false);
+    });
+}
+
+function loadCrossPath ( event ) { 
+    loadPage();
+    if (!event) {
+        return;
+    }
+
+    vars.disagree = false;
+    setCrossPathsValue( $.lblPlace, event.place['name'] );
+    setCrossPathsValue( $.lblTime, moment(event.start_time).format('h:mmA') );
+    
+    $.lblTime.value = moment(event.start_time).format();
+    $.btnIWillBeThere.show();
+    vars.mapUrl = event.place['website'] || event.place['name'];
+    
+    //cache the old Place if the matcher want to create new cross path with this place
+    if ( event.place ) {
+        var place = event.place;
+        
+        crossPath['place'] = {
+            yelpId:     place.custom_fields.yelpId,
+            name:       place.name,
+            website:    place.website,
+            mobile_url: place.custom_fields.mobile_url,
+            image_url:  place.custom_fields.image_url,
+            phone_number:   place.phone_number,
+            address:    [place.address],
+            categories: place.custom_fields.categories,
+            display_address:   place.custom_fields.display_address,
+            city:       place.city
+        };
+    }
+}
+
+function acceptEvent ( res ) {
+    if ( res && res.length ) {
+        var event       = res[0],
+            agree_users = event.agree_users;
+            agree_users = ( agree_users ) ? agree_users.split(',') : [];
+            
+        if ( agree_users.indexOf ( Ti.App.currentUser.id ) == -1 ) {
+            agree_users.push ( Ti.App.currentUser.id );
+        }
+        
+        var event_data = { 
+            event_id : event.id,
+            custom_fields: {
+                agree_users: agree_users.join(',')  
+            }
+        };
+
+        Api.updateEvent ({ 
+            data : JSON.stringify( event_data ) 
+        },
+        function(res) {
+            Alloy.Globals.toggleAI(false);
+            if ( res.success ) {
+                Alloy.Globals.PageManager.load({
+                    url:        'cross_paths_preview',
+                    isReset:    true,
+                    data:       { mode: 'review', crossPath: res.crossPath }
+                });
+            } else {
+                Alloy.Globals.Common.showDialog({
+                    title:      'Error',
+                    message:    res.error
+                });
+            }
+        });
+    }
+}
+
+function denyEvent ( res ) {
+    if ( res && res.length ) {
+        var event          = res[0],
+            disagree_users = event.disagree_users;
+            disagree_users = ( disagree_users ) ? disagree_users.split(',') : [];
+            
+        if ( disagree_users.indexOf ( Ti.App.currentUser.id ) == -1 ) {
+            disagree_users.push ( Ti.App.currentUser.id );
+        }
+        
+        var event_data = { 
+            event_id : event.id,
+            custom_fields: {
+                disagree_users: disagree_users.join(',')  
+            }
+        };
+
+        Api.updateEvent ({ 
+            data : JSON.stringify( event_data ) 
+        },
+        function(res) {
+            Alloy.Globals.toggleAI(false);
+            if ( res.success ) {
+                Ti.API.log('Event denied sucessfully!');
+            } else {
+                Alloy.Globals.Common.showDialog({
+                    title:      'Error',
+                    message:    res.error
+                });
+            }
+        });
+    }
 }

@@ -36,7 +36,7 @@ exports.cacheUser = function() {
 exports.checkSession = function(success, error) {
 	var currentUser = Ti.App.Properties.getObject('currentUser', false );
 	
-	if ( !currentUser ) {
+	if ( !currentUser || !currentUser.external_accounts ) {
 		error();
 		return;
 	}

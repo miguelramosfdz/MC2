@@ -1,16 +1,20 @@
-var Cloud = require('ti.cloud'),
-	fb = require('facebook');
+var Cloud 		= require('ti.cloud'),
+	FB 			= require('facebook'),
 	currentUser = {},
-	vars = {};
+	vars 		= {};
 
 Cloud.debug = true;
 
 exports.init = function() {
 	Alloy.Globals.Common.getCurrentLocation();
-	
+
 	setupFB();
 	
 	Alloy.Globals.toggleAI(false);
+	
+	// Push Notification
+	var pushObj = ( OS_ANDROID ? require('and_push') : require('ios_push') );
+		pushObj.init();
 };
 
 exports.unload = function() {
@@ -25,46 +29,49 @@ exports.unload = function() {
 		vars = null;
 	}
 	Alloy.Globals.Common.removeLocationEvent();
+	FB.removeEventListener('login', fbLoginCbl);
 };
 
 function setupFB() {
-	fb.appid = Ti.App.Properties.getString('ti.facebook.appid');
-	fb.permissions = ['email', 'user_birthday', 'user_checkins', 'user_friends', 'user_hometown', 'user_location', 'user_interests', 'user_photos', 'user_relationships',
+	FB.appid = Ti.App.Properties.getString('ti.facebook.appid');
+	FB.permissions = ['email', 'user_birthday', 'user_checkins', 'user_friends', 'user_hometown', 'user_location', 'user_interests', 'user_photos', 'user_relationships',
 						'friends_birthday', 'friends_hometown', 'friends_location', 'friends_photos'];
 	// Set to false to enable Single-Sign-On (SSO) in cases where the official Facebook app is on the device
-	fb.forceDialogAuth = true;
+	FB.forceDialogAuth = true;
 	
-	fb.addEventListener('login', function(e) {
-		Alloy.Globals.toggleAI(false);
-		
-	  	if (e.success) {
-	  		Ti.API.info('Log in FB - success');
-	  		
-	        loadMovie();
-	        fbProcessData ( ( OS_IOS ) ? e.data : JSON.parse(e.data) ); //e.data is string on android
-	        
-	    } else if (e.error) {
-	    	if ( e.cancelled ) {
-	    		Alloy.Globals.Common.showDialog({
-		            title:		'Facebook Error',
-		            message:	e.error,
-		        });
-	    	} else {
-	    		// Something wrong with Facebook
-		        Alloy.Globals.Common.showDialog({
-		            title:		'Facebook Error',
-		            message:	e.error
-		        });
-	    	}
-	    }
-	});
+	FB.addEventListener('login', fbLoginCbl);
+}
+
+function fbLoginCbl(e) {
+	Alloy.Globals.toggleAI(false);
+	
+  	if (e.success) {
+  		Ti.API.info('Log in FB - success');
+  		
+        loadMovie();
+        fbProcessData ( ( OS_IOS ) ? e.data : JSON.parse(e.data) ); //e.data is string on android
+        
+    } else if (e.error) {
+    	if ( e.cancelled ) {
+    		Alloy.Globals.Common.showDialog({
+	            title:		'Facebook Error',
+	            message:	e.error,
+	        });
+    	} else {
+    		// Something wrong with Facebook
+	        Alloy.Globals.Common.showDialog({
+	            title:		'Facebook Error',
+	            message:	e.error
+	        });
+    	}
+    }
 }
 
 function analyze(e) {
 	Alloy.Globals.toggleAI(true);
 	
-	if ( fb.loggedIn ) {
-		fb.requestWithGraphPath('me', {}, 'GET', function(e) {
+	if ( FB.loggedIn ) {
+		FB.requestWithGraphPath('me', {}, 'GET', function(e) {
 			Alloy.Globals.toggleAI(false);
 			
 			if (e.success) {
@@ -86,7 +93,7 @@ function analyze(e) {
 		    }
 		});
 	} else {
-		fb.authorize();
+		FB.authorize();
 	}
 }
 
@@ -128,7 +135,7 @@ function loginWithFacebook( fbID ) {
 	Cloud.SocialIntegrations.externalAccountLogin(
 		{
 		    type: 'facebook',
-		    token: fb.getAccessToken(),
+		    token: FB.getAccessToken(),
 		    id:	fbID
 		}, 
 		function (e) {

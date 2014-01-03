@@ -17,6 +17,7 @@ exports.set = function(params) {
 };
 
 function setBusyTime(label, text) {
+	label.text = text;
 	if (OS_IOS) {
 		label.attributedString = Ti.UI.iOS.createAttributedString({
 		    text: text,
@@ -29,8 +30,6 @@ function setBusyTime(label, text) {
 		        }
 		    ]
 		});
-	} else {
-		label.text = text;
 	}
 }
 

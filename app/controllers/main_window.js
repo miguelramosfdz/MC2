@@ -2,6 +2,10 @@ exports.init = function(params) {
 	Alloy.Globals.loggedIn = true;
 	
 	loadHomepage( arguments[0] || {} );
+	
+	// Push Notification
+	var pushObj = ( OS_ANDROID ? require('and_push') : require('ios_push') );
+		pushObj.init();
 };
 
 exports.cleanup = function() {
@@ -36,10 +40,12 @@ function loadHomepage( args ) {
 	
 	var container = Ti.UI.createView({  });
 	
-	var oPageManager = require('page_manager');
+	var oPageManager = require('managers/page');
 		pageManager = new oPageManager(),
 		defaultPage = 'someone_like',
 		defaultPageData = null;
+  	
+  	Alloy.Globals.PageManager = pageManager;
   	
   	var appRedirect = Ti.App.Properties.getObject('appRedirect');
   	if (appRedirect) {
@@ -55,8 +61,6 @@ function loadHomepage( args ) {
 		defaultPageData: defaultPageData
 	});
 		
-	Alloy.Globals.PageManager = pageManager;
-	
 	// initialize menu
 	
 	var leftMenu = Alloy.createController('elements/leftmenu');

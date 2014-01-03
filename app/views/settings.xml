@@ -18,8 +18,14 @@
 				<Label class="button-label">Delete Account</Label>
 			</View>
 			
-			<!--TODO for testing-->
-			<Label class="button-label version" >Version 1.4 - Dec 26, 2013</Label>
+			<!--TODO for test-->
+			<View class="user_info">
+                <Label class="button-label" id="name">Username</Label>
+                <Label class="button-label" id="email">Email</Label>
+                <Label class="button-label" id="userId">User Id</Label>
+            </View>
+
+			<Label class="button-label version" >Version 1.7 - Jan 03, 2014</Label>
 		</View>
 	</View>
 </Alloy>

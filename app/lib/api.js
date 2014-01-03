@@ -262,6 +262,12 @@ exports.checkCrossPath = function ( userId, success, error ) {
             			success({
 		        			has_active_cross_path: 	false 	
 		        		});
+            		} else if ( custom_fields.agree_users && custom_fields.agree_users.indexOf(userId) != -1 ) { //user has accepted this event
+            		    success({
+                            has_active_cross_path:  true,
+                            type:                   'accepted',
+                            crossPath:              crossPath
+                        });
             		} else { // User not has a decision yet
             			success({
 	            			has_active_cross_path: 	true,

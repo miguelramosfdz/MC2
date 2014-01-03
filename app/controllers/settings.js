@@ -4,6 +4,8 @@ var Cloud = require('ti.cloud');
 exports.init = function() {
   	loadNav();
   	Alloy.Globals.toggleAI(false);
+  	//TODO: for test
+  	loadCurrentUser();
 };
 
 function loadNav() {
@@ -30,6 +32,7 @@ function logout() {
 	    	var fb = require('facebook');
 				fb.logout();
 	
+			Ti.App.Properties.setString('deviceToken', '');
 	    	Ti.App.Properties.setObject('currentUser', false );
 	    	Ti.App.currentUser = false;
 	    	Alloy.Globals.loggedIn = false;
@@ -44,4 +47,14 @@ function logout() {
 	        });
 	    }
 	});
+}
+//TODO: for test
+function loadCurrentUser () {
+    if ( Ti.App.currentUser ) {
+        var user = Ti.App.currentUser;
+
+        $.name.text     = user.custom_fields['name'];
+        $.userId.text   = user.id;
+        $.email.text    = user.email;
+    }
 }

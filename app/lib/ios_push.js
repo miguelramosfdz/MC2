@@ -49,13 +49,13 @@ function receivePush(e) {
 		case 'cross_path':
 			if (Alloy.Globals.loggedIn) {
         		Alloy.Globals.PageManager.load({
-					url:        'cross_paths_preview',
+					url:        'cross_paths',
 	                isReset:    true,
 	                data:       { mode: 'review', event_id: data.event_id }
 				}); 
         	} else {
 	        	Ti.App.Properties.setObject('appRedirect', {
-					url:        'cross_paths_preview',
+					url:        'cross_paths',
 	                isReset:    true,
 	                data:       { mode: 'review', event_id: data.event_id }
 				});
