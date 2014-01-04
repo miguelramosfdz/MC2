@@ -195,14 +195,14 @@ function validateData () {
     
     // selected time must after current time, minimum is 35 mins.
     if ( moment( $.lblTime.value ).diff( moment() ) <= 35 * 60 * 1000 ) {
-        _message = 'Too late to create a Cross path, Please pick a valid Time';
+        _message = 'Sorry, Please pick a time at least 35 mins in the future. We want to make sure your matches have enough time to arrive.';
     } else if ( !crossPath['place']['address'][0] ) {
         _message = 'Please pick a valid Place';
     }
     
     if ( _message ) {
         Alloy.Globals.Common.showDialog({
-           title: 'Error',
+           title: 'Oops',
            message: _message
         });
         result = false;
