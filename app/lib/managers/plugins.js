@@ -81,8 +81,6 @@ function winDestroy(params, win) {
 }
 
 function windowOpened(e) {
-	Ti.API.error('windowOpened');
-	
 	e.source.removeEventListener('open', windowOpened);
 	
 	toggleAI(true);
@@ -263,7 +261,6 @@ function toggleAI(visible, message, timeout) {
 		
 		_AIs.push(ai);
 		
-		Ti.API.error('toggleAI true');
 	} else {
 		var ii = _AIs.length;
 		if (ii) {
@@ -272,7 +269,6 @@ function toggleAI(visible, message, timeout) {
 					_AIs[i].close();
 			  	};
 			  	_AIs.length = 0;
-				Ti.API.error('toggleAI false ' + ii);
 			} else {
 				_AI_Timeout = setTimeout(toggleAI, 500);
 			}

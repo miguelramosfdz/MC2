@@ -37,12 +37,13 @@ function setupFB() {
 	FB.permissions = ['email', 'user_birthday', 'user_checkins', 'user_friends', 'user_hometown', 'user_location', 'user_interests', 'user_photos', 'user_relationships',
 						'friends_birthday', 'friends_hometown', 'friends_location', 'friends_photos'];
 	// Set to false to enable Single-Sign-On (SSO) in cases where the official Facebook app is on the device
-	FB.forceDialogAuth = true;
+	FB.forceDialogAuth = false;
 	
 	FB.addEventListener('login', fbLoginCbl);
 }
 
 function fbLoginCbl(e) {
+	Ti.API.warn('fbLoginCbl');
 	Alloy.Globals.toggleAI(false);
 	
   	if (e.success) {
@@ -51,50 +52,19 @@ function fbLoginCbl(e) {
         loadMovie();
         fbProcessData ( ( OS_IOS ) ? e.data : JSON.parse(e.data) ); //e.data is string on android
         
-    } else if (e.error) {
-    	if ( e.cancelled ) {
-    		Alloy.Globals.Common.showDialog({
-	            title:		'Facebook Error',
-	            message:	e.error,
-	        });
-    	} else {
-    		// Something wrong with Facebook
-	        Alloy.Globals.Common.showDialog({
-	            title:		'Facebook Error',
-	            message:	e.error
-	        });
-    	}
+    } else {
+        Alloy.Globals.Common.showDialog({
+            title:	'Facebook Error',
+            message: e.error ? e.error : 'Unknown Error',
+        });
     }
 }
 
 function analyze(e) {
 	Alloy.Globals.toggleAI(true);
 	
-	if ( FB.loggedIn ) {
-		FB.requestWithGraphPath('me', {}, 'GET', function(e) {
-			Alloy.Globals.toggleAI(false);
-			
-			if (e.success) {
-				Ti.API.info('FB request fb.me - success');
-				
-				loadMovie();
-		        fbProcessData ( JSON.parse(e.result));
-		        
-		    } else if (e.error) {
-		    	Alloy.Globals.Common.showDialog({
-		            title:	'Facebook Error',
-		            message: e.error,
-		    	});
-		    } else {
-		        Alloy.Globals.Common.showDialog({
-		            title:	'Facebook Error',
-		            message: 'Unknown Error',
-		        });
-		    }
-		});
-	} else {
-		FB.authorize();
-	}
+	Ti.API.warn('FB.authorize');
+	FB.authorize();
 }
 
 function fbProcessData ( fbInfo ) {
@@ -153,7 +123,7 @@ function loginWithFacebook( fbID ) {
                         vars.send_email = true;
                 }
 				
-				if ( user.photo && user['custom_fields'] && user['custom_fields']['device_token'] ) {
+				if ( user.photo && user['custom_fields'] && user['custom_fields']['has_photo'] ) {
 					Ti.App.currentUser = user;
 					Alloy.Globals.Common.cacheUser();
 					vars.finishLoading = 1;

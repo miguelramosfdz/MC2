@@ -31,7 +31,7 @@ exports.loadFeeds = function(excludedUserIDS, success, error) {
 	
 	var filter = {
 		"id": 			{ "$nin": excludedUserIDS }, 				 
-		"first_name":	{ "$exists" : true },						// to make sure matchers have photo
+		"has_photo":	true,						// to make sure matchers have photo
 	    "$and": 		[ { "age": {"$gte": customFields.like_age_from} }, { "age": {"$lte": customFields.like_age_to} } ],
         "status":		'approved'
    	};
@@ -46,8 +46,8 @@ exports.loadFeeds = function(excludedUserIDS, success, error) {
    	}
    	
 	Cloud.Users.query({
-	    // page: 		1,
-	    // per_page: 	20,
+	    page: 		1,
+	    per_page:	100,
 	    sel: 		{ "all": ["id", "_gender", "liked", "device_token", "photo", "urls"] }, // Selects the object fields to display
 	    where: 		filter
 	}, function (e) {
@@ -71,8 +71,8 @@ exports.searchFacebookFriends = function(success, error) {
 	    } else {
 	    	error && error();
 	    	
-	        alert('Error:\n' +
-	            ((e.error && e.message) || JSON.stringify(e)));
+	        // alert('Error:\n' +
+	            // ((e.error && e.message) || JSON.stringify(e)));
 	    }
 	});
 };

@@ -12,12 +12,14 @@ exports.init = function() {
 	subscribePush();
 	loadUserInfo();
 	
-	var	pictureUrl = 'https://graph.facebook.com/' + currentUser.fbID + '/picture?width=320&height=320';
-	downloadPicture (pictureUrl, function (res) {
-    	if (res) {
-    		currentUser['photo'] = res;
-    	}
-	});
+	downloadPicture (
+		'https://graph.facebook.com/' + currentUser.fbID + '/picture?width=320&height=320', 
+		function (res) {
+	    	if (currentUser && res) {
+	    		currentUser['photo'] = res;
+	    	}
+		}
+	);
 	
 	Alloy.Globals.toggleAI(false);
 };
@@ -137,6 +139,10 @@ function updateUser ( e ) {
 	// Push Device Token
 	custom_fields['device_token'] = Ti.App.Properties.getString('deviceToken', '');
 	
+	if ( currentUser.photo ) {
+		custom_fields['has_photo'] = true;	
+	}
+	
 	Cloud.Users.update( currentUser, function (e) {
 	    if (e.success) {
 	    	if ( e.users[0] ) {
@@ -151,8 +157,7 @@ function updateUser ( e ) {
 
 				    Api.emailPhoto (
 				        {
-				            //TODO: update content
-				            content: 'There\'re new photos need your approval: ' + e.users[0].id
+				            content: 'There\'re new photos need your approval'
 				        }
 				    );
 				}
