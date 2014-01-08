@@ -4,7 +4,7 @@
 		<View class="body">
 			
 			<View class="wrapper">
-				<Label class="intro">* Pick a place * Go \n& MeetCute will let your matches know where they can cross paths with you.</Label>
+				<Label class="intro">· Pick a place · Go \n& MeetCute will let your matches know \n where they can cross paths with you.</Label>
 			
 				<View class="row first-row">
 					<Label class="label">Place:</Label>
@@ -17,19 +17,19 @@
 				</View>
 				
 				<View class="button button-view-map" onClick="showMap">
-					<Label class="button-label map-link">view map</Label>
+					<Label class="button-label map-link">more info</Label>
 					<ImageView class="button-icon icon-map"/>
 				</View>
 			</View>
 			
 			<View class="button button-surprise-me" onClick="surpriseMe">
 				<ImageView class="button-icon icon-update"/>
-				<Label class="button-label">surprise me</Label>
+				<Label class="button-label">Surprise me</Label>
 			</View>
 			
 			<View id="btnIWillBeThere" class="button button-ok" onClick="clickOnIWillBeThere">
 				<ImageView class="button-icon icon-ok"/>
-				<Label class="button-label">i'll be there</Label>
+				<Label class="button-label">I'll be there</Label>
 			</View>
 			
 			
