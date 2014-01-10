@@ -2,4 +2,4 @@
 	".border": { height: 1, backgroundColor: '#fff' }
 	".item": { height: Alloy.CFG.size_44 }
 		".icon": { width: Alloy.CFG.size_30, left: Alloy.CFG.size_10, touchEnabled: false }
-		".title": { left: Alloy.CFG.size_50, font: { fontSize: Alloy.CFG.size_16 }, color: '#fff', touchEnabled: false }
+		".title": { left: Alloy.CFG.size_50, font: { fontSize: Alloy.CFG.size_16, fontFamily: 'AGaramondPro-Regular' }, color: '#fff', touchEnabled: false }

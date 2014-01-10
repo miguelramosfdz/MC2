@@ -12,8 +12,9 @@ var meetcute_api = require("ti.cloud.meetcute.api"),
 		Then exclude them :)
 		http://docs.appcelerator.com/cloud/latest/#!/api/SocialIntegrations-method-facebook_search_friends 
  */
-exports.loadFeeds = function(excludedUserIDS, success, error) {
-	var customFields = Ti.App.currentUser.custom_fields;
+exports.loadFeeds = function(data, success, error) {
+	var customFields = Ti.App.currentUser.custom_fields,
+		excludedUserIDS = data.excludedUserIDS;
 	
 	// exclude current user and FB Friends + viewed photo
 	excludedUserIDS.push( Ti.App.currentUser.id );
@@ -46,13 +47,13 @@ exports.loadFeeds = function(excludedUserIDS, success, error) {
    	}
    	
 	Cloud.Users.query({
-	    page: 		1,
-	    per_page:	100,
+	    page: 		data.page,
+	    per_page:	data.per_page,
 	    sel: 		{ "all": ["id", "_gender", "liked", "device_token", "photo", "urls"] }, // Selects the object fields to display
 	    where: 		filter
 	}, function (e) {
 	    if (e.success) {
-	    	success && success( e.users );
+	    	success && success( e.users, e.meta );
 	    	
 	    } else {
 	    	error && error();

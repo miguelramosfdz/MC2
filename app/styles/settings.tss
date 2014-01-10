@@ -1,6 +1,6 @@
 ".button": { width: Ti.UI.SIZE, height: Ti.UI.SIZE, layout: 'vertical' }
 	".button-icon": { touchEnabled: false }
-	".button-label": { font: { fontSize: Alloy.CFG.size_12 }, color: '#fff', touchEnabled: false }
+	".button-label": { font: { fontSize: Alloy.CFG.size_12, fontFamily: 'AGaramondPro-Regular' }, color: '#fff', touchEnabled: false }
 	
 ".button-logout": { top: Alloy.CFG.size_60 }
 	".icon-logout": { width: Alloy.CFG.size_70, image: '/images/settings/btn-logout.png' }	

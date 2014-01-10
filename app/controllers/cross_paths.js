@@ -171,44 +171,49 @@ function clickOnIWillBeThere() {
             );
         }
         
-        if ( !validateData() ) {
-        	return;
-        }
-        
-        crossPath['event'] =  {
-            user_id:    Ti.App.currentUser.id,
-            name:       $.lblPlace.text + ' at ' + $.lblTime.text,
-            start_time: $.lblTime.value
-        };
-        
-        Alloy.Globals.PageManager.load({
-            url: 		'cross_paths_preview',
-            isReset: 	false,
-            data: 		{ mode: 'new', crossPath: crossPath }
-        });
+        validateData();
     }
 }
 
+function loadCrossPathPreview () {
+    crossPath['event'] =  {
+        user_id:    Ti.App.currentUser.id,
+        name:       $.lblPlace.text + ' at ' + $.lblTime.text,
+        start_time: $.lblTime.value
+    };
+    
+    Alloy.Globals.PageManager.load({
+        url:        'cross_paths_preview',
+        isReset:    false,
+        data:       { mode: 'new', crossPath: crossPath }
+    });
+}
+
 function validateData () {
-    var _message = '',
-        result = true;
-    
-    // selected time must after current time, minimum is 35 mins.
-    if ( moment( $.lblTime.value ).diff( moment() ) <= 35 * 60 * 1000 ) {
-        _message = 'Sorry, Please pick a time at least 35 mins in the future. We want to make sure your matches have enough time to arrive.';
-    } else if ( !crossPath['place']['address'][0] ) {
-        _message = 'Please pick a valid Place';
-    }
-    
-    if ( _message ) {
+    if ( !crossPath['place']['address'][0] ) {
         Alloy.Globals.Common.showDialog({
            title: 'Oops',
-           message: _message
+           message: 'Please pick a valid Place'
         });
-        result = false;
+    } else if ( moment( $.lblTime.value ).diff( moment() ) <= 35 * 60 * 1000 ) {// selected time must after current time, minimum is 35 mins else cross path for Tomorrow.
+        $.lblTime.value = moment( $.lblTime.value ).add ('days', 1).format(); // add 1 day to start time
+        
+        //Confirm to create cross path for Tomorrow
+        var confirm = Alloy.Globals.Common.showDialog({
+           title: 'Oops',
+           message: 'Just so you know you have set a time for ' + moment( $.lblTime.value ).format('h:mmA') + ' Tomorrow',
+           buttonNames: ['OK','Cancel']
+        });
+        
+        confirm.addEventListener('click', function (e) {
+            // if OK
+            if (e.index == 0) {
+                loadCrossPathPreview();
+            }
+        });
+    } else {
+        loadCrossPathPreview();
     }
-    
-    return result;
 }
 
 function initTime () {
@@ -300,20 +305,19 @@ function generateSurprisePlace () {
 }
 
 function generateSurpriseTime( period ) {
-    var hours   = [ 9, 21 ],// Yelp API unable to get close or open time, so default values are [ 9:00AM, 21:00PM ]
+    var hours   = [ 8, 20 ],// Yelp API unable to get close or open time, so default values are [ 8:00AM, 20:00PM ]
         minutes = [ 0, Math.floor( 60 / period ) - 1 ],
         _time   = moment();
     
     // time not in busy times
     checkBusyTime(hours);
     
-    // time must greater than current time
-    if (hours[0] <= _time.hour()) {
-    	hours[0] = _time.hour() + 1;
+   	var _HH = Math.floor ( Math.random() * ( hours[1] - hours[0] ) + hours[0] ),
+        _mm = ( _HH == hours[1] ) ? 0 : Math.floor ( Math.random() * ( minutes[1] - minutes[0] ) + minutes[0] ) * period;
+    
+    if ( hours[0] == _HH && _HH < hours[1] && _mm < 35 ) {
+        _mm = 35;
     }
-        
-   	var _HH     = Math.floor ( Math.random() * ( hours[1] - hours[0] ) + hours[0] ),
-        _mm     = ( _HH == hours[1] ) ? 0 : Math.floor ( Math.random() * ( minutes[1] - minutes[0] ) + minutes[0] ) * period;
     
     _time.hour(_HH);
     _time.minute(_mm); 
@@ -340,13 +344,13 @@ function checkBusyTime(range) {
 	// after
 	if (prefix == '2') {
 		if (range[1] > busy_time.getHours()) {
-			range[1] = busy_time.getHours() - 1;
+			range[1] = busy_time.getHours();
 		}
 	}
 	// before
 	else {
 		if (range[0] < busy_time.getHours()) {
-			range[0] = busy_time.getHours() + 1;
+			range[0] = busy_time.getHours();
 		}
 	}
 	

@@ -4,7 +4,7 @@ var callback,
 
 /*
  params = {
- 	callack: function(values){ alert( values[0].title ); },
+ 	callback: function(values){ alert( values[0].title ); },
  	data: [
  		[{ title: 'After' }, { title: 'Before' }]
  	],

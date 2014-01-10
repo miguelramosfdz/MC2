@@ -1,15 +1,15 @@
 ".wrapper": { layout: 'vertical' }
 	"Label": { color: '#fff' }
-	".title": { top: Alloy.CFG.size_30, font: { fontSize: Alloy.CFG.size_12 } }
-	".place": { top: Alloy.CFG.size_40, font: { fontSize: Alloy.CFG.size_20 }, textAlign: 'center' }
-	".address": { height: Ti.UI.SIZE, top: Alloy.CFG.size_5, bottom: Alloy.CFG.size_5, font: { fontSize: Alloy.CFG.size_13 } }
-	".time": { font: { fontSize: Alloy.CFG.size_20 } }
-	".countdown": { top: Alloy.CFG.size_40, font: { fontSize: Alloy.CFG.size_12 } }
+	".title": { top: Alloy.CFG.size_30, font: { fontSize: Alloy.CFG.size_12, fontFamily: 'AGaramondPro-Regular' } }
+	".place": { top: Alloy.CFG.size_40, font: { fontSize: Alloy.CFG.size_20, fontFamily: 'AGaramondPro-Regular' }, textAlign: 'center' }
+	".address": { height: Ti.UI.SIZE, top: Alloy.CFG.size_5, bottom: Alloy.CFG.size_5, font: { fontSize: Alloy.CFG.size_13, fontFamily: 'AGaramondPro-Regular' } }
+	".time": { font: { fontSize: Alloy.CFG.size_20, fontFamily: 'AGaramondPro-Regular' } }
+	".countdown": { top: Alloy.CFG.size_40, font: { fontSize: Alloy.CFG.size_12, fontFamily: 'AGaramondPro-Regular' } }
 	"#lblCountdown": { top: Alloy.CFG.size_5 }
 	
 	".button": { width: Ti.UI.SIZE, height: Ti.UI.SIZE, top: Alloy.CFG.size_30, layout: 'vertical' }
 		".button-icon": { width: Alloy.CFG.size_70, touchEnabled: false }
-		".button-label": { left: Alloy.CFG.size_5, font: { fontSize: Alloy.CFG.size_12 }, color: '#fff', touchEnabled: false }
+		".button-label": { left: Alloy.CFG.size_5, font: { fontSize: Alloy.CFG.size_12, fontFamily: 'AGaramondPro-Regular' }, color: '#fff', touchEnabled: false }
 	
 	".button-back": {}
 		".icon-back": { height: Alloy.CFG.size_70, image: '/images/cross_paths_preview/btn-pick-new-place.png' }
@@ -17,4 +17,4 @@
 	".button-wingman": { visible: false }	
 		".icon-wingman": { height: Alloy.CFG.size_76, image: '/images/cross_paths_preview/btn-wingman.png' }
 		
-".intro": { bottom: Alloy.CFG.size_20, font: { fontSize: Alloy.CFG.size_12 }, color: '#999' }
+".intro": { bottom: Alloy.CFG.size_20, font: { fontSize: Alloy.CFG.size_12, fontFamily: 'AGaramondPro-Regular' }, color: '#999' }

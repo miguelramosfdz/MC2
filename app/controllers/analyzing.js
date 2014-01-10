@@ -89,7 +89,7 @@ function fbProcessData ( fbInfo ) {
     };
     
 	if ( fbInfo.birthday ) {
-		currentUser['custom_fields']['age'] = new Date().getFullYear() - parseInt( fbInfo.birthday.split('/')[2], 10);
+		currentUser['custom_fields']['age'] = Alloy.Globals.Common.age(fbInfo.birthday);
 	}
 	
 	vars.userCoordinates = Ti.App.Properties.getObject('last_location', false);

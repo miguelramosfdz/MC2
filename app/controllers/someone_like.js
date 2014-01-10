@@ -1,4 +1,7 @@
-var vars = {},
+var vars = {
+	  	PER_PAGE: 20,
+	  	PER_PREFETCH: 15
+	},
 	Api = require('api');
 
 exports.init = function() {
@@ -39,7 +42,10 @@ exports.init = function() {
   	}
   	vars.photoPath = photoPath;
   	
-  	getFeeds();
+  	vars.page = 1;
+  	vars.swipe_count = 0;
+  	vars.users = [];
+  	searchFacebookFriends();
   	
   	onLoggedIn();
 };
@@ -82,7 +88,7 @@ function loadNav() {
 	});
 }
 
-function getFeeds() {
+function searchFacebookFriends() {
   	Api.searchFacebookFriends(
 		function(users) {
 			var userIDS = [];
@@ -91,43 +97,54 @@ function getFeeds() {
 	            userIDS.push( users[i].id );
 	        }
 	        
-	        Api.loadFeeds(
-	        	userIDS, 
-	        	loadFeeds,
-	        	getFeedError
-	        );
+	        vars.excludedUserIDS = userIDS;
+	        getFeeds();
 		},
 		function() {
-			Api.loadFeeds(
-				[], 
-	        	loadFeeds,
-	        	getFeedError
-	        );
+			vars.excludedUserIDS = [];
+			getFeeds();
 		}
 	);
+}
+
+function getFeeds() {
+	Api.loadFeeds(
+    	{
+    		excludedUserIDS: vars.excludedUserIDS,
+    		page: vars.page,
+    		per_page: vars.PER_PAGE
+    	}, 
+    	loadFeeds,
+    	getFeedError
+    );
 }
 
 function getFeedError() {
 	Alloy.Globals.toggleAI(false);
 }
 
-function loadFeeds(users) {
-	vars.users = users; 
+function loadFeeds(users, meta) {
+	vars.users = vars.users.concat(users);
+	vars.total_pages = meta.total_pages;
+	vars.total_results = meta.total_results;
 	
 	var len = users.length;
 	if (len) {
-		for(var i=0,ii=len >= 3 ? 3 : len; i<ii; i++){
-			loadCard(i, i);
-		};
-	  	
-	  	// mark view for the first user
-	  	Api.onViewPhoto( users[0].id );
-	  	
-	  	vars.dataIndex = ii - 1;
-	  	vars.containerIndex = 0;
-	  	
-	  	vars.swipeEnable = len > 1;
-	  	$.card_0.parent.addEventListener('swipe', listSwipe);
+		// load first users
+		if (meta.page == 1) {
+			for(var i=0,ii=len >= 3 ? 3 : len; i<ii; i++){
+				loadCard(i, i);
+			};
+			
+			// mark view for the first user
+	  		Api.onViewPhoto( users[0].id );
+	  		
+	  		vars.dataIndex = ii - 1;
+	  		vars.containerIndex = 0;
+	  		
+	  		vars.swipeEnable = len > 1;
+	  		$.card_0.parent.addEventListener('swipe', listSwipe);
+		}
 	}
 	
 	Alloy.Globals.toggleAI(false);
@@ -195,7 +212,7 @@ function listSwipe(e) {
   			
   			vars.dataIndex++;
   			
-  			var len = vars.users.length;
+  			var len = vars.total_results;
   			if (vars.dataIndex < len) {
   				loadCard(vars.dataIndex, previousIndex);
   			} else {
@@ -204,6 +221,15 @@ function listSwipe(e) {
   				}
   			}
   		});
+  		
+  		// prefetch feed
+	  	vars.swipe_count++;
+  		if (vars.swipe_count % vars.PER_PREFETCH == 0) {
+			vars.page++;
+			if (vars.page <= vars.total_pages) {
+				getFeeds();
+			}
+		}
   	}
 }
 
@@ -255,7 +281,7 @@ function loadAnimation(container, gender) {
 		wrapper.add(image);
 		image.start();
 		
-		var message = Ti.UI.createLabel({ text: 'analyzing... improving matches', bottom: Alloy.CFG.size_5, font: { fontSize: Alloy.CFG.size_13 }, color: '#fff', textAlign: 'center' });
+		var message = Ti.UI.createLabel({ text: 'analyzing... improving matches', bottom: Alloy.CFG.size_5, font: { fontSize: Alloy.CFG.size_13, fontFamily: 'AGaramondPro-Regular' }, color: '#fff', textAlign: 'center' });
 		wrapper.add(message);
 	container.add(wrapper);	
 	
@@ -266,7 +292,7 @@ function loadAnimation(container, gender) {
 			image = null; 
 		});
 		message.animate({ opacity: 0, duration: 500 }, function(e) {
-			var message2 = Ti.UI.createLabel({ text: 'MeetCute will help you cross paths with someone like ' + ( ( gender && gender.toLowerCase() == 'female') ? 'her.': 'him.' ), opacity: 0, font: { fontSize: Alloy.CFG.size_13 }, color: '#fff', textAlign: 'center' });
+			var message2 = Ti.UI.createLabel({ text: 'MeetCute will help you cross paths with someone like ' + ( ( gender && gender.toLowerCase() == 'female') ? 'her.': 'him.' ), opacity: 0, font: { fontSize: Alloy.CFG.size_13, fontFamily: 'AGaramondPro-Regular' }, color: '#fff', textAlign: 'center' });
 			wrapper.add(message2);
 			message2.animate({ opacity: 1, duration: 500 });
 		});

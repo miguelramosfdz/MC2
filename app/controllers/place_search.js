@@ -37,8 +37,8 @@ function initYelp() {
                     };
                     
                     var row = Ti.UI.createTableViewRow({ place: business, height: Alloy.CFG.size_40, layout: 'horizontal', hasChild: true });
-                        row.add( Ti.UI.createLabel({ text: b.name, font: { fontSize: Alloy.CFG.size_14, fontWeight: 'bold' }, color: '#000', height: Alloy.CFG.size_40, left: Alloy.CFG.size_10 }) );
-                        row.add( Ti.UI.createLabel({ text: '(' + b.location.display_address[0] + ')', font: { fontSize: Alloy.CFG.size_12 }, color: '#000', height: Alloy.CFG.size_20, top: Alloy.CFG.size_10, left: Alloy.CFG.size_5, right: Alloy.CFG.size_10, wordWrap: false, ellipsize: true }) );
+                        row.add( Ti.UI.createLabel({ text: b.name, font: { fontSize: Alloy.CFG.size_14, fontFamily: 'AGaramondPro-Bold' }, color: '#000', height: Alloy.CFG.size_40, left: Alloy.CFG.size_10 }) );
+                        row.add( Ti.UI.createLabel({ text: '(' + b.location.display_address[0] + ')', font: { fontSize: Alloy.CFG.size_12, fontFamily: 'AGaramondPro-Regular' }, color: '#000', height: Alloy.CFG.size_20, top: Alloy.CFG.size_10, left: Alloy.CFG.size_5, right: Alloy.CFG.size_10, wordWrap: false, ellipsize: true }) );
                     data.push(row);
                 }
             });

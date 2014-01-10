@@ -1,9 +1,9 @@
-#appname: meetcute2
-#appid: org.meetcute
-#type: mobile
-#guid: 7cd43a35-d39c-43b7-a40d-411bb9cc4a39
-#version: 1.0
-#publisher: not specified
-#url: not specified
-#image: appicon.png
-#desc: not specified
+#appname:meetcute
+#appid:org.meetcute
+#type:mobile
+#guid:ec523641-1c05-4029-90c8-c64d96a2bcbd
+#version:1.0
+#publisher:minh
+#url:http://
+#image:appicon.png
+#desc:not specified

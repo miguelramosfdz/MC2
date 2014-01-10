@@ -5,7 +5,10 @@ function showDialog(args) {
 		args.buttonNames = ['OK'];
 	}
 	
-	Ti.UI.createAlertDialog(args).show();
+	var dialog = Ti.UI.createAlertDialog(args);
+	
+	dialog.show();
+	return dialog; 
 }
 exports.showDialog = showDialog;
 
@@ -259,3 +262,12 @@ function checkGeoPermission() {
     
     return error;
 }
+
+exports.age = function(dob) {
+	var now = new Date(),
+		dob = dob.split('/'),
+		m	= parseInt(dob[0], 10),
+		y 	= now.getFullYear() - parseInt(dob[2], 10);
+		
+	return (now.getMonth() + 1 >= m) ? y : y - 1;
+};

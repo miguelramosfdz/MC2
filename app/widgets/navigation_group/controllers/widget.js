@@ -53,7 +53,7 @@ exports.update = function(params) {
 };
 
 function createButton(title) {
-  	return Ti.UI.createButton({ title: title, width: Alloy.CFG.size_44, height: Alloy.CFG.size_44, backgroundImage: 'NONE', font: { fontSize: Alloy.CFG.size_9 }, color: '#fff' });
+  	return Ti.UI.createButton({ title: title, width: Alloy.CFG.size_44, height: Alloy.CFG.size_44, backgroundImage: 'NONE', font: { fontSize: Alloy.CFG.size_9, fontFamily: 'AGaramondPro-Regular' }, color: '#fff' });
 }
 
 function createImageButton(icon) {
@@ -121,7 +121,7 @@ function loadRightButton(right) {
 function loadTitle(title) {
 	if (title) {
 		if (typeof title == 'string') {
-	  		$.center.add( Ti.UI.createLabel({ text: title, font: { fontSize: Alloy.CFG.size_20 }, color: '#fff', ellipsize: true, wordWrap: true }) );
+	  		$.center.add( Ti.UI.createLabel({ text: title, font: { fontSize: Alloy.CFG.size_20, fontFamily: 'AGaramondPro-Regular' }, color: '#fff', ellipsize: true, wordWrap: true }) );
 	  	} else {
 	  		$.center.add( title );
 	  	}
