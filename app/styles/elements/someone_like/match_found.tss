@@ -3,7 +3,7 @@
 	".title": { top: Alloy.CFG.size_5, font: { fontSize: Alloy.CFG.size_20, fontFamily: 'AGaramondPro-Regular' }, color: '#fff' }
 	".message": { top: Alloy.CFG.size_20, font: { fontSize: Alloy.CFG.size_14, fontFamily: 'AGaramondPro-Regular' }, color: '#fff', textAlign: 'center' }
 	".figure": { width: Alloy.CFG.size_200, height: Alloy.CFG.size_50, top: Alloy.CFG.size_10 }
-		".man": { width: Alloy.CFG.size_16, height: Alloy.CFG.size_50, left: 0, image: '/images/someone_like/man.png' }
+		".man": { width: Alloy.CFG.size_50, height: Alloy.CFG.size_50, left: 0, image: '/images/someone_like/man.png' }
 		".line": { top: 0, font: { fontSize: Alloy.CFG.size_12, fontFamily: 'AGaramondPro-Regular' }, color: '#fff' }
-		".woman": { width: Alloy.CFG.size_21, height: Alloy.CFG.size_50, right: 0, image: '/images/someone_like/woman.png' }
+		".woman": { width: Alloy.CFG.size_50, height: Alloy.CFG.size_50, right: 0, image: '/images/someone_like/woman.png' }
 	".button": { top: Alloy.CFG.size_10, font: { fontSize: Alloy.CFG.size_20, fontFamily: 'AGaramondPro-Regular' }, color: '#fff' }	
