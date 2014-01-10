@@ -37,7 +37,7 @@ function setupFB() {
 	FB.permissions = ['email', 'user_birthday', 'user_checkins', 'user_friends', 'user_hometown', 'user_location', 'user_interests', 'user_photos', 'user_relationships',
 						'friends_birthday', 'friends_hometown', 'friends_location', 'friends_photos'];
 	// Set to false to enable Single-Sign-On (SSO) in cases where the official Facebook app is on the device
-	FB.forceDialogAuth = false;
+	FB.forceDialogAuth = true;
 	
 	FB.addEventListener('login', fbLoginCbl);
 }
