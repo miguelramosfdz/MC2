@@ -169,8 +169,8 @@ function listSwipe(e) {
   	if (e.direction == 'up') {
   		if (vars.swipeEnable == false) {
   			Alloy.Globals.Common.showDialog({
-	            title:		'That\'s all folks!',
-	            message:	'Give us a day or so to analyze the data and find more matches for you.'
+	            title:    'That\'s all folks!',
+ 				message:  'Give us a day or so to analyze the data and find more matches for you.'
          	});
   			return;
   		}

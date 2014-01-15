@@ -96,7 +96,8 @@ function WindowManager(onChange) {
 			var activity = Ti.Android.currentActivity;
 			activity && activity.finish();
 		}
-
+        Ti.App.fireEvent('location:stopTracking');
+        
 		Ti.API.log('Window Manager: Exit!');
 	}
 	

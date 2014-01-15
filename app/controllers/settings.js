@@ -24,6 +24,8 @@ function loadNav() {
 
 function logout() {
 	Alloy.Globals.toggleAI(true);
+	// stop tracking location
+	Ti.App.fireEvent('location:stopTracking');
 	
 	Cloud.Users.logout(function (e) {
 		Alloy.Globals.toggleAI(false);

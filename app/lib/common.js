@@ -124,12 +124,12 @@ exports.reverseToBusyString = function  ( time ) {
     return result;
 };
 
-exports.trackingLocationResponse = function ( status ) {
-    if ( status == 1 ) {// arrived 
-    	var _trackingEvent = Ti.App.Properties.getObject('_trackingEvent', false);
-    	
-        if ( _trackingEvent ) {
-               //get event data
+exports.trackingLocationResponse = function ( status, location ) {
+    var _trackingEvent = Ti.App.Properties.getObject('_trackingEvent', false);
+    
+    if ( _trackingEvent ) {
+        if ( status == 1 ) {// arrived 
+            //get event data
             Api.getEventById ({ 
                   event_id: _trackingEvent.eventId
             },
@@ -152,10 +152,34 @@ exports.trackingLocationResponse = function ( status ) {
                     Api.updateEvent ( { data : JSON.stringify( event_data ) } );
                 }
             });
-        } 
-    } 
+            Ti.App.Properties.removeProperty('_trackingEvent');
+        } else if ( status == 3 ) { // update agree_users_locations
+            //get event data
+            Api.getEventById ({ 
+                  event_id: _trackingEvent.eventId
+            },
+            function (res) {
+                if ( res && res.length ) {
+                    var event           = res[0],
+                        users_locations = event.custom_fields.users_locations;
+                        users_locations = ( users_locations ) ? JSON.parse(users_locations) : {};
+                    
+                    users_locations[Ti.App.currentUser.id] = location;
+                    
+                    var event_data = { 
+                        event_id : event.id,
+                        custom_fields: {
+                            agree_users_locations: JSON.stringify(users_locations)
+                        }
+                    };
 
-    Ti.App.Properties.removeProperty('_trackingEvent');
+                    Api.updateEvent ( { data : JSON.stringify( event_data ) } );
+                }
+            });
+        } else {
+            Ti.App.Properties.removeProperty('_trackingEvent');
+        }
+    }
 };
 
 exports.answerFeedback = function ( data ) {

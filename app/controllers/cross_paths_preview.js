@@ -284,6 +284,9 @@ function goBack(e) {
 	  	    vars.createOnExit = false;
 	  	    
 	  	    if (vars.mode == 'new') {
+	  	        if ( OS_IOS ) {
+                	Ti.App.removeEventListener('pause', submitOnPause);
+            	}
 	  			Alloy.Globals.PageManager.loadPrevious();
 	  	    }
 	  	}
