@@ -2,7 +2,7 @@ var locationTime,
 	locationTimeExpired = 60 * 60 * 1000, // 1 hour
 	locationDestination,
 	backgroundServices,
-	lastUpdated = new Date().getTime(),
+	lastUpdated,
 	geo 		= require('geo');
 
 exports.tracking = function(time, dest) {
@@ -57,11 +57,14 @@ function trackingCallback(e) {
 		locationResult(2);
 	}
 	
-	if ( e.success && lastUpdated && (new Date().getTime() - lastUpdated) >= (3 * 60 *1000) ) {// 3 mins
-	    var coords = e.coords;
+	if ( e.success ) {// 2 mins
+		
+		if ( !lastUpdated || (new Date().getTime() - lastUpdated) >= (2 * 60 *1000) ) {
+			var coords = e.coords;
 	    
-	    lastUpdated = new Date().getTime();
-	    Alloy.Globals.Common.trackingLocationResponse ( 3, coords.latitude + '_' + coords.longitude + '_' + coords.timestamp );// update last location
+		    lastUpdated = new Date().getTime();
+		    Alloy.Globals.Common.trackingLocationResponse ( 3, coords.latitude + '_' + coords.longitude + '_' + coords.timestamp );// update last location
+		}
 	}
 }
 
@@ -70,7 +73,7 @@ function finishTracking() {
   	
   	locationDestination = null;
   	locationTime = null;
-  	lastUpdated = 0;
+  	lastUpdated = null;
 }
 
 function showMessage(message) {

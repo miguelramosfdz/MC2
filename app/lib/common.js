@@ -169,7 +169,7 @@ exports.trackingLocationResponse = function ( status, location ) {
                     var event_data = { 
                         event_id : event.id,
                         custom_fields: {
-                            agree_users_locations: JSON.stringify(users_locations)
+                            users_locations: JSON.stringify(users_locations)
                         }
                     };
 
