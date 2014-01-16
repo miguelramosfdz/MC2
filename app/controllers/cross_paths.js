@@ -231,7 +231,7 @@ function surpriseMe() {
         generateSurprisePlace ();
     } else {
         Alloy.Globals.toggleAI(true);
-        //var last_location = { longitude: -122.417614, latitude: 37.781569 };
+        // var last_location = { longitude: -122.417614, latitude: 37.781569 }; // TODO: Hardcode to test Yelp in VN
         
         if ( last_location ) {
             setYelpParams ( last_location.latitude, last_location.longitude );
@@ -433,7 +433,7 @@ function loadCrossPath ( event ) {
 function acceptEvent ( res ) {
     if ( res && res.length ) {
         var event       = res[0],
-            agree_users = event.agree_users;
+            agree_users = event['custom_fields'].agree_users;
             agree_users = ( agree_users ) ? agree_users.split(',') : [];
             
         if ( agree_users.indexOf ( Ti.App.currentUser.id ) == -1 ) {
