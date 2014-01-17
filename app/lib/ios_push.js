@@ -32,43 +32,6 @@ function receivePush(e) {
     Ti.API.info('Received push:\n\t' + JSON.stringify(e));
     
 	var data = e.data;
-		    
-    switch( data.atras ) {
-		case 'reminder':
-            if ( !Ti.App.currentUser || !Ti.App.currentUser.id ) {
-		        return;
-		    }
-		    
-		    Ti.App.Properties.setObject('_trackingEvent', { eventId: data.eventId } );
-
-		    var location = require('location');
-			    location.tracking(new Date().getTime(), { latitude: data.latitude, longitude: data.longitude } ); // test android device arrived
-			    // location.tracking(new Date().getTime(), { latitude: 37.78583526611328, longitude: -122.40641784667969 }); // test ios simulator arrived
-            break;
-            
-		case 'cross_path':
-			if (Alloy.Globals.loggedIn) {
-        		Alloy.Globals.PageManager.load({
-					url:        'cross_paths',
-	                isReset:    true,
-	                data:       { mode: 'review', event_id: data.event_id }
-				}); 
-        	} else {
-	        	Ti.App.Properties.setObject('appRedirect', {
-					url:        'cross_paths',
-	                isReset:    true,
-	                data:       { mode: 'review', event_id: data.event_id }
-				});
-			}
-			break;
-		case 'feedback':
-			if (Alloy.Globals.loggedIn) {
-				Alloy.Globals.Common.answerFeedback( data );
-					
-			} else {				
-				// This action will be handled in someone_like
-				Ti.App.Properties.setObject('onLoggedIn', { action: 'answerFeedback', data: data }); 
-			}
-		    break;
-    }
+	
+	Alloy.Globals.Common.pushNotificationCallback( data );	    
 }

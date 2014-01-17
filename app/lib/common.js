@@ -182,15 +182,15 @@ exports.trackingLocationResponse = function ( status, location ) {
     }
 };
 
-exports.answerFeedback = function ( data ) {
+function answerFeedback ( data, message ) {
     if ( !Ti.App.currentUser || !Ti.App.currentUser.id ) {
         return;
     }
     
     //This is response format on android: {"atras":"feed_back","android":{"sound":"default","alert":"Did you see someone you'd like to cross paths with again?"},"crossPath":{"event":{"id":"52a7d7d1bc4dc20b1500064c","start_time":"2013-12-11T03:40:51+0000"},"place":{"address":"882 N Point St","name":"Black Point Cafe"}}}
     var feedbackDialog =  Ti.UI.createAlertDialog({
-        title: 			data.eventName,
-        message: 		( OS_ANDROID ) ? data.android.alert : data.alert,
+        title: 			data.name,
+        message: 		message,
         buttonNames: 	['YES', 'NO'] 
     });
      
@@ -202,36 +202,44 @@ exports.answerFeedback = function ( data ) {
             return;
         }
         
-        Api.getEventById ({ 
-            event_id: data.eventId
-        },
-        function (res) {
-            if ( res && res.length ) {
-                var event        = res[0],
-                    //new data to update
-                    event_update = { 
-                        event_id : event.id,
-                        custom_fields: {}
-                    };
-          
-                var _field      = ( !e.index ) ? 'feedback_yes' : 'feedback_no',// get field to update yes | no
-                    _field_data = event.custom_fields[ _field ]; 
-                    
-                // check exist data
-                _field_data = ( _field_data ) ? _field_data.split(',') : [];
-    
-                if ( _field_data.indexOf ( Ti.App.currentUser.id ) == -1 ) {
-                    _field_data.push ( Ti.App.currentUser.id );
-                }
-    
-                event_update.custom_fields[_field] = _field_data.join(',');
-                
-                //update event
-                Api.updateEvent ( { data : JSON.stringify( event_update ) } );
+        getEventById ( data.id, function (event) {
+            if (!event) {
+                return;
             }
+                    //new data to update
+            var event_update = { 
+                event_id : event.id,
+                custom_fields: {}
+            };
+          
+            var _field      = ( !e.index ) ? 'feedback_yes' : 'feedback_no',// get field to update yes | no
+                _field_data = event.custom_fields[ _field ]; 
+                    
+            // check exist data
+            _field_data = ( _field_data ) ? _field_data.split(',') : [];
+
+            if ( _field_data.indexOf ( Ti.App.currentUser.id ) == -1 ) {
+                _field_data.push ( Ti.App.currentUser.id );
+            }
+
+            event_update.custom_fields[_field] = _field_data.join(',');
+            
+            //update event
+            Api.updateEvent ( { data : JSON.stringify( event_update ) } );
         });
     });
 };
+
+function getEventById ( event_id, callback ) {
+    Api.getEventById ({ 
+        event_id: event_id
+    },
+    function (res) {
+        if ( res && res.length ) {
+            callback && callback( res[0]);
+        }
+    });
+}
 
 exports.getCurrentLocation = function ( callback ) {
 
@@ -295,3 +303,53 @@ exports.age = function(dob) {
 		
 	return (now.getMonth() + 1 >= m) ? y : y - 1;
 };
+
+function pushNotificationCallback ( data ) {
+    if (!data) {
+        return;
+    }
+    
+    switch( data.atras ) {
+    case "reminder":
+        if ( !Ti.App.currentUser || !Ti.App.currentUser.id ) {
+            return;
+        }
+            
+        Ti.App.Properties.setObject('_trackingEvent', { eventId: data.eventId } );
+        getEventById (data.eventId, function(event) {
+            if (event) {
+                var location  = require('location'),
+                    latitude  = ( event.place['latitude'] ) ? parseFloat ( event.place['latitude']) : 0,
+                    longitude = ( event.place['longitude'] ) ? parseFloat ( event.place['longitude']) : 0;
+                    
+                location.tracking(new Date().getTime(), { latitude: latitude, longitude: longitude } );
+            }
+        });
+        break;
+        
+    case "cross_path":
+         if (Alloy.Globals.loggedIn) {
+            Alloy.Globals.PageManager.load({
+                url:        'cross_paths',
+                isReset:    true,
+                data:       { mode: 'review', event_id: data.event_id }
+            }); 
+        } else {
+            Ti.App.Properties.setObject('appRedirect', {
+                url:        'cross_paths',
+                isReset:    true,
+                data:       { mode: 'review', event_id: data.event_id }
+            });
+        }
+        break;
+    case "feedback":
+        getEventById (data.eventId, function (event) {
+            if (event) {
+                answerFeedback(event, ( OS_ANDROID ) ? data.android.alert : data.alert);
+            }
+        });
+        break;
+    }
+}
+
+exports.pushNotificationCallback = pushNotificationCallback;
