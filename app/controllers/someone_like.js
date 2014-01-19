@@ -1,6 +1,7 @@
 var vars = {
-	  	PER_PAGE: 20,
-	  	PER_PREFETCH: 15
+	  	PER_PAGE: 		20,
+	  	PER_PREFETCH: 	15,
+	  	args: 			arguments[0] || {}
 	},
 	Api = require('api');
 
@@ -47,24 +48,37 @@ exports.init = function() {
   	vars.users = [];
   	searchFacebookFriends();
   	
-  	onLoggedIn();
+  	if ( vars.args.mode ) {
+  		if ( vars.args.mode == 'feedback' ) {
+  			
+	  		Api.getEventById ({ 
+		        event_id:  vars.args.event_id
+		    },
+		    function (res) {
+		        if ( res && res.length ) {
+		            Alloy.Globals.Common.answerFeedback(res[0], vars.args.alert);
+		        }
+		    });
+		    
+	   	} else if ( vars.args.mode == 'reminder' ) {
+	   		
+	   		Api.getEventById ({ 
+		        event_id:  vars.args.event_id
+		    },
+		    function (res) {
+		        if ( res && res.length ) {
+		        	var event = res[0],
+		        		location  = require('location'),
+	                    latitude  = ( event.place['latitude'] ) ? parseFloat ( event.place['latitude']) : 0,
+	                    longitude = ( event.place['longitude'] ) ? parseFloat ( event.place['longitude']) : 0;
+	                 
+	                Ti.App.Properties.setObject('_trackingEvent', { eventId: data.eventId } );    
+	                location.tracking(new Date().getTime(), { latitude: latitude, longitude: longitude } );
+		        }
+		    });
+	   }
+  	}
 };
-
-function onLoggedIn() {
-	var onLoggedInCbl = Ti.App.Properties.getObject('onLoggedIn', false);
-	
-	if ( !onLoggedInCbl ) {
-		return;
-	}
-	
-	Ti.App.Properties.removeProperty('onLoggedIn');
-	
-	switch( onLoggedInCbl.action ) {
-		case 'answerFeedback':
-            Alloy.Globals.Common.answerFeedback( onLoggedInCbl.data );
-            break;
-    }
-}
 
 function loadNav() {
 	var btnMenu = Alloy.createController('elements/button', {

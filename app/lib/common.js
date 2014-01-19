@@ -36,6 +36,10 @@ exports.cacheUser = function() {
 	Ti.App.Properties.setObject('currentUser', currentUser);
 };
 
+function getCurrentUser() {
+	return Ti.App.Properties.getObject('currentUser', {});
+}
+
 exports.checkSession = function(success, error) {
 	var currentUser = Ti.App.Properties.getObject('currentUser', false );
 	
@@ -136,11 +140,13 @@ exports.trackingLocationResponse = function ( status, location ) {
             function (res) {
                 if ( res && res.length ) {
                     var event         = res[0],
-                        arrived_users = event.custom_fields.arrived_users;
-                        arrived_users = ( arrived_users ) ? arrived_users.split(',') : [];
+                        arrived_users = event.custom_fields.arrived_users,
+                        currentUserId = getCurrentUser().id;
+                        
+                    arrived_users = ( arrived_users ) ? arrived_users.split(',') : [];
                     
-                    if ( arrived_users.indexOf (Ti.App.currentUser.id) == -1 ) {
-                       arrived_users.push ( Ti.App.currentUser.id );
+                    if ( arrived_users.indexOf( currentUserId ) == -1 ) {
+                       arrived_users.push( currentUserId );
                     }
                     
                     var event_data = { 
@@ -183,10 +189,6 @@ exports.trackingLocationResponse = function ( status, location ) {
 };
 
 function answerFeedback ( data, message ) {
-    if ( !Ti.App.currentUser || !Ti.App.currentUser.id ) {
-        return;
-    }
-    
     //This is response format on android: {"atras":"feed_back","android":{"sound":"default","alert":"Did you see someone you'd like to cross paths with again?"},"crossPath":{"event":{"id":"52a7d7d1bc4dc20b1500064c","start_time":"2013-12-11T03:40:51+0000"},"place":{"address":"882 N Point St","name":"Black Point Cafe"}}}
     var feedbackDialog =  Ti.UI.createAlertDialog({
         title: 			data.name,
@@ -217,9 +219,11 @@ function answerFeedback ( data, message ) {
                     
             // check exist data
             _field_data = ( _field_data ) ? _field_data.split(',') : [];
+            
+            var currentUserId = getCurrentUser().id;
 
-            if ( _field_data.indexOf ( Ti.App.currentUser.id ) == -1 ) {
-                _field_data.push ( Ti.App.currentUser.id );
+            if ( _field_data.indexOf ( currentUserId ) == -1 ) {
+                _field_data.push ( currentUserId );
             }
 
             event_update.custom_fields[_field] = _field_data.join(',');
@@ -229,6 +233,8 @@ function answerFeedback ( data, message ) {
         });
     });
 };
+
+exports.answerFeedback = answerFeedback;
 
 function getEventById ( event_id, callback ) {
     Api.getEventById ({ 
@@ -310,21 +316,27 @@ function pushNotificationCallback ( data ) {
     }
     
     switch( data.atras ) {
+    	
     case "reminder":
-        if ( !Ti.App.currentUser || !Ti.App.currentUser.id ) {
-            return;
+    
+        if ( getCurrentUser().id ) {
+        	getEventById (data.eventId, function(event) {
+	            if (event) {
+	                var location  = require('location'),
+	                    latitude  = ( event.place['latitude'] ) ? parseFloat ( event.place['latitude']) : 0,
+	                    longitude = ( event.place['longitude'] ) ? parseFloat ( event.place['longitude']) : 0;
+	                 
+	                Ti.App.Properties.setObject('_trackingEvent', { eventId: data.eventId } );    
+	                location.tracking(new Date().getTime(), { latitude: latitude, longitude: longitude } );
+	            }
+	        });
+        } else {
+        	Ti.App.Properties.setObject('appRedirect', {
+                url:        'someone_like',
+                isReset:    true,
+                data:       { mode: 'reminder', event_id: data.eventId }
+            });
         }
-            
-        Ti.App.Properties.setObject('_trackingEvent', { eventId: data.eventId } );
-        getEventById (data.eventId, function(event) {
-            if (event) {
-                var location  = require('location'),
-                    latitude  = ( event.place['latitude'] ) ? parseFloat ( event.place['latitude']) : 0,
-                    longitude = ( event.place['longitude'] ) ? parseFloat ( event.place['longitude']) : 0;
-                    
-                location.tracking(new Date().getTime(), { latitude: latitude, longitude: longitude } );
-            }
-        });
         break;
         
     case "cross_path":
@@ -342,12 +354,21 @@ function pushNotificationCallback ( data ) {
             });
         }
         break;
+        
     case "feedback":
-        getEventById (data.eventId, function (event) {
-            if (event) {
-                answerFeedback(event, ( OS_ANDROID ) ? data.android.alert : data.alert);
-            }
-        });
+    	if ( getCurrentUser().id ) {
+            getEventById (data.eventId, function (event) {
+	            if (event) {
+	                answerFeedback(event, ( OS_ANDROID ) ? data.android.alert : data.alert);
+	            }
+	        }); 
+        } else {
+            Ti.App.Properties.setObject('appRedirect', {
+                url:        'someone_like',
+                isReset:    true,
+                data:       { mode: 'feedback', event_id: data.eventId, alert: ( OS_ANDROID ) ? data.android.alert : data.alert }
+            });
+        }
         break;
     }
 }
