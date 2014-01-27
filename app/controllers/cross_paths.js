@@ -38,8 +38,7 @@ exports.reload = function(data) {
 		vars.mapUrl = crossPath['place'].website || data.place.name;
 	}
 };
-
-exports.cleanup = function() {
+exports.unload = function  () {
     Alloy.Globals.Common.removeLocationEvent();
 };
 
@@ -182,6 +181,8 @@ function loadCrossPathPreview () {
         start_time: $.lblTime.value
     };
     
+    Alloy.Globals.Common.removeLocationEvent();
+    
     Alloy.Globals.PageManager.load({
         url:        'cross_paths_preview',
         isReset:    false,
@@ -231,7 +232,8 @@ function surpriseMe() {
         generateSurprisePlace ();
     } else {
         Alloy.Globals.toggleAI(true);
-        // var last_location = { longitude: -122.417614, latitude: 37.781569 }; // TODO: Hardcode to test Yelp in VN
+        
+        // last_location = { longitude: -122.417614, latitude: 37.781569 }; // TODO: Hard code to test Yelp in VN
         
         if ( last_location ) {
             setYelpParams ( last_location.latitude, last_location.longitude );
@@ -453,6 +455,13 @@ function acceptEvent ( res ) {
         function(res) {
             Alloy.Globals.toggleAI(false);
             if ( res.success ) {
+            	
+            	if ( OS_IOS ) {
+                	// Set Local Notify to reminder user relaunch the app when "needed" to active location tracking
+                	var local_reminder = require('local_reminder');
+	    	    		local_reminder.register(res.crossPath.event.start_time);
+                }
+                
                 Alloy.Globals.PageManager.load({
                     url:        'cross_paths_preview',
                     isReset:    true,

@@ -28,7 +28,7 @@ var vars = arguments[0],
 
 vars.time = 60; // 60 seconds
 vars.timer = null;
-vars.createOnExit = vars.mode != 'old';
+vars.createOnExit = (vars.mode != 'old');
 
 exports.init = function() {
   	loadNav();
@@ -41,7 +41,7 @@ exports.unload = function() {
 
 	if (vars.createOnExit) {
 		if (vars.mode == 'new') {
-			createCrossPath(true);
+			createCrossPath(false);
 		}
 	}
 };
@@ -125,7 +125,7 @@ function updateTime() {
             $.lblNotification.text = '*notifications will be sent in ' + time + ' second' + ( time > 1 ? 's' : '' );
         } else {
             // Create Place & Event on the server
-        	createCrossPath();
+        	createCrossPath(true);
         	createCrossPathFinished();
         }
     }, 1000 );
@@ -160,11 +160,11 @@ function isActivePage() {
   	return false;
 }
 
-function createCrossPath (noCallback) {
+function createCrossPath(showAI) {
     // begin create cross path, set this true to unable to create more cross path if user unload page and click on Cross Path menu
     Ti.App.Properties.setInt('lock_cross_path', new Date().getTime());
     
-    if ( !noCallback ) {
+    if ( showAI ) {
         Alloy.Globals.toggleAI(true);
     }
     
@@ -266,7 +266,14 @@ function filterSuccess(users) {
 	    	    
 	    	    Alloy.Globals.toggleAI(false);
     	    }
+    	    
     	    // create cross path finished, remove this to unlock
+    	    if (OS_IOS && res.success) {
+    	    	// Set Local Notify to reminder user relaunch the app when "needed" to active location tracking
+    	    	var local_reminder = require('local_reminder');
+	    	    	local_reminder.register(crossPath.event.start_time);
+    	    }
+    	    
     	    Ti.App.Properties.removeProperty('lock_cross_path');
     	}
     );

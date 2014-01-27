@@ -25,7 +25,7 @@
                 <Label class="button-label" id="userId">User Id</Label>
             </View>
 
-			<Label class="button-label version" >Version 2.0.2 - Jan 20, 2014</Label>
+			<Label class="button-label version" >Version 2.1 - Jan 27, 2014</Label>
 		</View>
 	</View>
 </Alloy>

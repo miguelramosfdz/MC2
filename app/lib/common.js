@@ -25,7 +25,7 @@ exports.checkInternet = function() {
 	return true;
 };
 
-exports.cacheUser = function() {
+function cacheUser() {
 	var Cloud = require('ti.cloud'),
 		currentUser = Ti.App.currentUser;
 	
@@ -34,7 +34,8 @@ exports.cacheUser = function() {
 	currentUser['lastLogined'] 	= new Date().getTime();
 	
 	Ti.App.Properties.setObject('currentUser', currentUser);
-};
+}
+exports.cacheUser = cacheUser;
 
 function getCurrentUser() {
 	return Ti.App.Properties.getObject('currentUser', {});
@@ -61,7 +62,7 @@ exports.checkSession = function(success, error) {
 		function (e) {
 		    if (e.success) {
 				Ti.App.currentUser = e.users[0];
-				Alloy.Globals.Common.cacheUser();
+				cacheUser();
 				success();
 				
 		    } else {
@@ -129,24 +130,27 @@ exports.reverseToBusyString = function  ( time ) {
 };
 
 exports.trackingLocationResponse = function ( status, location ) {
-    var _trackingEvent = Ti.App.Properties.getObject('_trackingEvent', false);
+    var eventId = Ti.App.Properties.getObject('_trackingEvent', {}).eventId,
+    	userId  = Ti.App.Properties.getObject('currentUser', {}).id;
     
-    if ( _trackingEvent ) {
+    if ( eventId && userId ) {
         if ( status == 1 ) {// arrived 
+        	
+        	Ti.API.error( '[Common Module] - User arrived event #' +  eventId);
+        	
             //get event data
             Api.getEventById ({ 
-                  event_id: _trackingEvent.eventId
+                  event_id: eventId
             },
             function (res) {
                 if ( res && res.length ) {
                     var event         = res[0],
-                        arrived_users = event.custom_fields.arrived_users,
-                        currentUserId = getCurrentUser().id;
+                    	arrived_users = event.custom_fields.arrived_users;
                         
                     arrived_users = ( arrived_users ) ? arrived_users.split(',') : [];
                     
-                    if ( arrived_users.indexOf( currentUserId ) == -1 ) {
-                       arrived_users.push( currentUserId );
+                    if ( arrived_users.indexOf( userId ) == -1 ) {
+                       arrived_users.push( userId );
                     }
                     
                     var event_data = { 
@@ -162,7 +166,7 @@ exports.trackingLocationResponse = function ( status, location ) {
         } else if ( status == 3 ) { // update agree_users_locations
             //get event data
             Api.getEventById ({ 
-                  event_id: _trackingEvent.eventId
+                  event_id: eventId
             },
             function (res) {
                 if ( res && res.length ) {
@@ -170,7 +174,7 @@ exports.trackingLocationResponse = function ( status, location ) {
                         users_locations = event.custom_fields.users_locations;
                         users_locations = ( users_locations ) ? JSON.parse(users_locations) : {};
                     
-                    users_locations[Ti.App.currentUser.id] = location;
+                    users_locations[userId] = location;
                     
                     var event_data = { 
                         event_id : event.id,
@@ -183,6 +187,9 @@ exports.trackingLocationResponse = function ( status, location ) {
                 }
             });
         } else {
+        	
+        	Ti.API.error( '[Common Module] - User NOT arrived event #' +  eventId);
+        	
             Ti.App.Properties.removeProperty('_trackingEvent');
         }
     }
@@ -248,22 +255,30 @@ function getEventById ( event_id, callback ) {
 }
 
 exports.getCurrentLocation = function ( callback ) {
-
-    if ( !checkGeoPermission() ) {
-        Ti.Geolocation.accuracy          = Ti.Geolocation.ACCURACY_HIGH;
-        Ti.Geolocation.preferredProvider = "gps";
-        
-        if ( OS_IOS ) {
-  			Ti.Geolocation.distanceFilter = 10;
-			Ti.Geolocation.purpose = "Get user location";
-  		}
-
-        Ti.Geolocation.addEventListener('location', locationCallback);
+    if ( false == Ti.App.Properties.getBool('location_on', false) ) {
+        Ti.API.error ('turn on location');
+    
+        if ( !checkGeoPermission() ) {
+            Ti.Geolocation.accuracy          = Ti.Geolocation.ACCURACY_HIGH;
+            Ti.Geolocation.preferredProvider = "gps";
+            
+            if ( OS_IOS ) {
+                Ti.Geolocation.distanceFilter = 10;
+                Ti.Geolocation.purpose = "Get user location";
+            }
+            
+            Ti.App.Properties.setBool('location_on', true);
+            Ti.Geolocation.addEventListener('location', locationCallback);
+        }
     }
 };
 
 exports.removeLocationEvent = function  () {
-    Ti.Geolocation.removeEventListener('location', locationCallback);
+    if ( Ti.App.Properties.getBool('location_on', false) ) {
+        Ti.API.error ('turn off location');
+        Ti.App.Properties.setBool('location_on', false);
+        Ti.Geolocation.removeEventListener('location', locationCallback);
+    }
 };
 
 function locationCallback ( e ) {
@@ -316,60 +331,65 @@ function pushNotificationCallback ( data ) {
     }
     
     switch( data.atras ) {
-    	
-    case "reminder":
-    
-        if ( getCurrentUser().id ) {
-        	getEventById (data.eventId, function(event) {
-	            if (event) {
-	                var location  = require('location'),
-	                    latitude  = ( event.place['latitude'] ) ? parseFloat ( event.place['latitude']) : 0,
-	                    longitude = ( event.place['longitude'] ) ? parseFloat ( event.place['longitude']) : 0;
-	                 
-	                Ti.App.Properties.setObject('_trackingEvent', { eventId: data.eventId } );    
-	                location.tracking(new Date().getTime(), { latitude: latitude, longitude: longitude } );
-	            }
-	        });
-        } else {
-        	Ti.App.Properties.setObject('appRedirect', {
-                url:        'someone_like',
-                isReset:    true,
-                data:       { mode: 'reminder', event_id: data.eventId }
-            });
-        }
-        break;
+	    case "reminder":
+	    	
+	    	var local_reminder = require('local_reminder');
+	    		local_reminder.cancelAllLocalNotifications();
+	    
+	    	if ( getCurrentUser().id ) {
+	        	getEventById (data.eventId, function(event) {
+	            	if (event) {
+	                	var location  = require('location'),
+	                    	latitude  = event.place['latitude'],
+	                    	longitude = event.place['longitude'];
+	                    
+		                Ti.App.Properties.setObject('_trackingEvent', { eventId: data.eventId } );    
+	                	location.tracking(new Date().getTime(), { latitude: latitude, longitude: longitude } );
+	            	}
+	        	});
+	        } else {
+	        	Ti.App.Properties.setObject('appRedirect', {
+	                url:        'someone_like',
+	                isReset:    true,
+	                data:       { mode: 'reminder', event_id: data.eventId }
+	            });
+	        }	
+	        
+	        break;
         
-    case "cross_path":
-         if (Alloy.Globals.loggedIn) {
-            Alloy.Globals.PageManager.load({
-                url:        'cross_paths',
-                isReset:    true,
-                data:       { mode: 'review', event_id: data.event_id }
-            }); 
-        } else {
-            Ti.App.Properties.setObject('appRedirect', {
-                url:        'cross_paths',
-                isReset:    true,
-                data:       { mode: 'review', event_id: data.event_id }
-            });
-        }
-        break;
-        
-    case "feedback":
-    	if ( getCurrentUser().id ) {
-            getEventById (data.eventId, function (event) {
-	            if (event) {
-	                answerFeedback(event, ( OS_ANDROID ) ? data.android.alert : data.alert);
-	            }
-	        }); 
-        } else {
-            Ti.App.Properties.setObject('appRedirect', {
-                url:        'someone_like',
-                isReset:    true,
-                data:       { mode: 'feedback', event_id: data.eventId, alert: ( OS_ANDROID ) ? data.android.alert : data.alert }
-            });
-        }
-        break;
+    	case "cross_path":
+         	if (Alloy.Globals.loggedIn) {
+            	Alloy.Globals.PageManager.load({
+	                url:        'cross_paths',
+	                isReset:    true,
+	                data:       { mode: 'review', event_id: data.event_id }
+            	}); 
+        	} else {
+	            Ti.App.Properties.setObject('appRedirect', {
+	                url:        'cross_paths',
+	                isReset:    true,
+	                data:       { mode: 'review', event_id: data.event_id }
+	            });
+        	}
+        	
+        	break;
+        	
+    	case "feedback":
+	    	if ( getCurrentUser().id ) {
+	        	getEventById (data.eventId, function (event) {
+	            	if (event) {
+	                	answerFeedback(event, ( OS_ANDROID ) ? data.android.alert : data.alert);
+	            	}
+	        	});
+	        } else {
+	            Ti.App.Properties.setObject('appRedirect', {
+	                url:        'someone_like',
+	                isReset:    true,
+	                data:       { mode: 'feedback', event_id: data.eventId, alert: ( OS_ANDROID ) ? data.android.alert : data.alert }
+	            });
+	        }
+	        
+	       	break;
     }
 }
 

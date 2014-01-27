@@ -69,8 +69,8 @@ exports.init = function() {
 		        if ( res && res.length ) {
 		        	var event = res[0],
 		        		location  = require('location'),
-	                    latitude  = ( event.place['latitude'] ) ? parseFloat ( event.place['latitude']) : 0,
-	                    longitude = ( event.place['longitude'] ) ? parseFloat ( event.place['longitude']) : 0;
+	                    latitude  = event.place['latitude'],
+	                    longitude = event.place['longitude'];
 	                 
 	                Ti.App.Properties.setObject('_trackingEvent', { eventId: data.eventId } );    
 	                location.tracking(new Date().getTime(), { latitude: latitude, longitude: longitude } );

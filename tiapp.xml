@@ -68,6 +68,7 @@
         <module platform="android">ti.cloudpush</module>
         <module platform="android">facebook</module>
         <module platform="iphone">facebook</module>
+        <module platform="iphone">bencoding.localnotify</module>
     </modules>
     <deployment-targets>
         <target device="android">true</target>

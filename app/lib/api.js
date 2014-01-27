@@ -185,6 +185,7 @@ exports.filterMatchers = function(start_time, excludedUserIDS, success, error) {
 		if (res.success) {
 			success && success(res.users);
 		} else {
+			Ti.API.error( 'API::filterMatchers error: ' + res);
 			error && error(res);
 		}
 	});
@@ -234,12 +235,16 @@ exports.checkCrossPath = function ( userId, success, error ) {
             for (var i=0, len=events.length; i < len; i++) {
             	var event      = events[i],
             	    crossPath  = {
+            	    	eventId: 		event.id,
                         place : {
                             name:       event.place['name'],
-                            address:    [event.place['address']]
+                            address:    [event.place['address']],
+                            latitude:   event.place['latitude'],
+                            longitude:  event.place['longitude'],
+                            status:     event.place['custom_fields']['status']
                         },
                         event: {
-                            event_id: event.id,
+                            event_id: 	event.id,
                             start_time: event.start_time
                         }
                     };

@@ -31,7 +31,8 @@ function receivePush(e) {
 	// {"code":0,"data":{"sound":"default","arrived_users":"","atras":"reminder","aps":{"sound":"default","alert":"Just a reminder, 30 mins until Cross path with a match for you at "},"alert":"Just a reminder, 30 mins until Cross path with a match for you at ","longitude":0,"latitude":0,"eventId":"52a04448b55c570b1c02be6a"},"type":"remote","source":{},"inBackground":false,"success":true}
     Ti.API.info('Received push:\n\t' + JSON.stringify(e));
     
-	var data = e.data;
+	var data = e.data,
+		Common = require('common');
 	
-	Alloy.Globals.Common.pushNotificationCallback( data );	    
+	Common.pushNotificationCallback( data );	    
 }
